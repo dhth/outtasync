@@ -27,7 +27,7 @@ func refreshCredentials(cmd string) tea.Cmd {
 
 func showDiff(stack Stack) tea.Cmd {
 	c := exec.Command("bash", "-c",
-		fmt.Sprintf("cat << EOF | git diff --dst-prefix='Actual Cloudformation stack' --no-index -- %s -\n%s\nEOF",
+		fmt.Sprintf("cat << 'EOF' | git diff --dst-prefix='Actual Cloudformation stack' --no-index -- %s -\n%s\nEOF",
 			stack.Local,
 			stack.Template,
 		))

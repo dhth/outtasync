@@ -53,8 +53,7 @@ one deployment environment but not on others. 🤷
 
 2. Place this file at `~/.config/outtasync.yml` *(optional)*
 
-3. Install `outtasync` by using `go install github.com/dhth/outtasync` or place
-   the binary somewhere in your `PATH`.
+3. Install `outtasync` by running `go install github.com/dhth/outtasync@latest`
 
 4. Run the TUI as follows:
 

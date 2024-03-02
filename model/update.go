@@ -30,9 +30,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			msg.stack.FetchStatus = StatusFailure
 			m.stacksList.SetItem(msg.index, msg.stack)
 		} else {
-			msg.stack.Drifted = true
+			msg.stack.OuttaSync = true
 			msg.stack.FetchStatus = StatusFetched
-			msg.stack.Drifted = msg.drifted
+			msg.stack.OuttaSync = msg.outtaSync
 			msg.stack.Template = msg.template
 			msg.stack.Err = nil
 			m.stacksList.SetItem(msg.index, msg.stack)

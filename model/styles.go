@@ -22,7 +22,7 @@ var (
 	driftStatusStyle = baseStyle.Copy().
 				Bold(true).
 				Align(lipgloss.Center).
-				Width(11)
+				Width(12)
 
 	fetchingStyle = driftStatusStyle.Copy().
 			Background(lipgloss.Color("#ebdbb2"))
@@ -30,7 +30,7 @@ var (
 	insSyncStyle = driftStatusStyle.Copy().
 			Background(lipgloss.Color("#b8bb26"))
 
-	driftedStyle = driftStatusStyle.Copy().
+	outtaSyncStyle = driftStatusStyle.Copy().
 			Background(lipgloss.Color("#fb4934"))
 
 	errorStyle = driftStatusStyle.Copy().

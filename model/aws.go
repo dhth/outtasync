@@ -35,8 +35,8 @@ func GetCFTemplateBody(index int, stack Stack) tea.Cmd {
 			return TemplateFetchedMsg{index, stack, "", false, err}
 		}
 		localFileContent := string(localFile)
-		drifted := localFileContent != templBody
-		return TemplateFetchedMsg{index, stack, templBody, drifted, err}
+		outtaSync := localFileContent != templBody
+		return TemplateFetchedMsg{index, stack, templBody, outtaSync, err}
 	}
 
 }

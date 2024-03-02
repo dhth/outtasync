@@ -72,7 +72,7 @@ func newAppItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 			case key.Matches(msgType, keys.showDiff):
 				switch stack.FetchStatus {
 				case StatusFetched:
-					switch stack.Drifted {
+					switch stack.OuttaSync {
 					case true:
 						return showDiff(stack)
 					case false:

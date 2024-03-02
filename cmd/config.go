@@ -66,7 +66,7 @@ func ReadConfig(configFilePath string) ([]model.Stack, error) {
 				Tag:            stack.Tag,
 				RefreshCommand: refreshCmd,
 				FetchStatus:    model.StatusUnfetched,
-				Drifted:        false,
+				OuttaSync:      false,
 				Err:            nil,
 			})
 		}

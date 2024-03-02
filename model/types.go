@@ -24,7 +24,7 @@ type Stack struct {
 	Tag            *string
 	RefreshCommand string
 	FetchStatus    fetchStatus
-	Drifted        bool
+	OuttaSync      bool
 	Err            error
 }
 
@@ -35,9 +35,9 @@ func (stack Stack) Description() string {
 	var status string
 	switch stack.FetchStatus {
 	case StatusFetched:
-		switch stack.Drifted {
+		switch stack.OuttaSync {
 		case true:
-			status = driftedStyle.Render("drifted")
+			status = outtaSyncStyle.Render("outta sync")
 		case false:
 			status = insSyncStyle.Render("in sync")
 		}
