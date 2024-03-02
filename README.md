@@ -9,6 +9,10 @@ This can occur when someone updates a stack but fails to commit the latest stack
 file to the codebase. Alternatively, it may happen when a stack is updated on
 one deployment environment but not on others. 🤷
 
+<p align="center">
+  <img src="./outtasync.gif?raw=true" alt="Usage" />
+</p>
+
 🛠️ Pre-requisites
 ---
 
