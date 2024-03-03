@@ -13,6 +13,22 @@ one deployment environment but not on others. 🤷
   <img src="./outtasync.gif?raw=true" alt="Usage" />
 </p>
 
+
+Install
+---
+
+**homebrew**:
+
+```sh
+brew install dhth/tap/outtasync
+```
+
+**go**:
+
+```sh
+go install github.com/dhth/outtasync@latest
+```
+
 🛠️ Pre-requisites
 ---
 
@@ -51,11 +67,15 @@ one deployment environment but not on others. 🤷
         region: eu-central-1
     ```
 
+`refreshCommand` overrides `globalRefreshCommand` whereever set.
+
+*Note: The `globalRefreshCommand` and `refreshCommand` settings are only needed
+if you want to invoke the command that refreshes your AWS credentials via the
+TUI directly.*
+
 2. Place this file at `~/.config/outtasync.yml` *(optional)*
 
-3. Install `outtasync` by running `go install github.com/dhth/outtasync@latest`
-
-4. Run the TUI as follows:
+3. Run the TUI as follows:
 
 ```bash
 outtasync
@@ -65,7 +85,7 @@ outtasync --config-file /path/to/config.yml
 outtasync -c /path/to/config.yml
 ```
 
-5. Press `?` to view keyboard shortcuts to use the TUI.
+4. Press `?` to view keyboard shortcuts to use the TUI.
 
 Acknowledgements
 ---
