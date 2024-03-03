@@ -1,2 +1,4 @@
 outtasync
 .quickrun
+cosign.key
+cosign.pub
