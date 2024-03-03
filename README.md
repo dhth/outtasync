@@ -4,7 +4,7 @@
 ---
 
 `outtasync` helps users quickly identify the CloudFormation stacks that have
-gone out of sync from the state represented by their counterpart stack files.
+gone out of sync with the state represented by their counterpart stack files.
 This can occur when someone updates a stack but fails to commit the latest stack
 file to the codebase. Alternatively, it may happen when a stack is updated on
 one deployment environment but not on others. 🤷
