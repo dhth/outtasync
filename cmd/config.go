@@ -36,7 +36,7 @@ func expandTilde(path string) string {
 	return path
 }
 
-func ReadConfig(configFilePath string) ([]model.Stack, error) {
+func ReadConfig(configFilePath string, profilesToFetch []string) ([]model.Stack, error) {
 	localFile, err := os.ReadFile(expandTilde(configFilePath))
 	if err != nil {
 		os.Exit(1)
@@ -46,10 +46,17 @@ func ReadConfig(configFilePath string) ([]model.Stack, error) {
 	if err != nil {
 		return nil, err
 	}
+	profilesMap := make(map[string]bool)
+	for _, p := range profilesToFetch {
+		profilesMap[p] = true
+	}
 
 	globalRefreshCmd := t.GlobalRefreshCommand
 	var rows []model.Stack
 	for _, profile := range t.Profiles {
+		if len(profilesToFetch) > 0 && !profilesMap[profile.Name] {
+			continue
+		}
 		for _, stack := range profile.Stacks {
 			var refreshCmd string
 			if stack.RefreshCommand != nil {

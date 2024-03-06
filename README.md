@@ -79,10 +79,8 @@ TUI directly.*
 
 ```bash
 outtasync
-# or
-outtasync --config-file /path/to/config.yml
-# or
-outtasync -c /path/to/config.yml
+outtasync -config-file /path/to/config.yml
+outtasync -profiles qa,prod
 ```
 
 4. Press `?` to view keyboard shortcuts to use the TUI.
