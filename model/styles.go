@@ -10,7 +10,7 @@ var (
 			PaddingRight(1).
 			Foreground(lipgloss.Color("#282828"))
 
-	baseListStyle = lipgloss.NewStyle().PaddingTop(1).PaddingRight(2).PaddingLeft(1).PaddingBottom(1).Width(listPadding + 10)
+	baseListStyle = lipgloss.NewStyle().PaddingTop(1).PaddingRight(2).PaddingLeft(1).PaddingBottom(1).Width(listWidth + 10)
 
 	stackListStyle = baseListStyle.Copy()
 

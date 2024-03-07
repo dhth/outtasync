@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	listPadding = 100
+	listWidth = 120
 )
 
 func (m model) View() string {

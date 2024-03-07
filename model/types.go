@@ -29,7 +29,7 @@ type Stack struct {
 }
 
 func (stack Stack) Title() string {
-	return fmt.Sprintf("%s", RightPadTrim(stack.Name, listPadding-20))
+	return fmt.Sprintf("%s", RightPadTrim(stack.Name, listWidth-20))
 }
 func (stack Stack) Description() string {
 	var status string
@@ -51,7 +51,7 @@ func (stack Stack) Description() string {
 	if stack.Err != nil {
 		desc = stack.Err.Error()
 	}
-	return fmt.Sprintf("@%s %s", RightPadTrim(desc, listPadding-20), status)
+	return fmt.Sprintf("@%s %s", RightPadTrim(desc, listWidth-20), status)
 }
 func (stack Stack) FilterValue() string { return stack.Name }
 

@@ -13,10 +13,11 @@ func InitialModel(stacks []Stack) model {
 	appDelegate := newAppItemDelegate(appDelegateKeys)
 
 	m := model{
-		stacksList: list.New(stackItems, appDelegate, listPadding, 0),
+		stacksList: list.New(stackItems, appDelegate, listWidth, 0),
 	}
 	m.stacksList.Title = "Stacks"
-	m.stacksList.SetFilteringEnabled(false)
+	m.stacksList.SetStatusBarItemName("stack", "stacks")
+	m.stacksList.DisableQuitKeybindings()
 
 	return m
 }

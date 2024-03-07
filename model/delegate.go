@@ -45,6 +45,18 @@ func newAppItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 		Copy()
 
 	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
+		fs := m.FilterState()
+		switch fs {
+		case list.FilterApplied:
+			switch msgType := msg.(type) {
+			case tea.KeyMsg:
+				if !key.Matches(msgType, keys.showDiff) {
+					return nil
+				}
+			}
+		case list.Filtering:
+			return nil
+		}
 		var stack Stack
 
 		var cmds []tea.Cmd

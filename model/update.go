@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -15,7 +16,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
-			return m, tea.Quit
+			fs := m.stacksList.FilterState()
+			if fs == list.Filtering || fs == list.FilterApplied {
+				m.stacksList.ResetFilter()
+			} else {
+				return m, tea.Quit
+			}
 		}
 	case tea.WindowSizeMsg:
 		_, h1 := stackListStyle.GetFrameSize()
