@@ -14,7 +14,7 @@ one deployment environment but not on others. 🤷
 </p>
 
 
-Install
+💾 Installation
 ---
 
 **homebrew**:

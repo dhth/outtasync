@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"log"
 	"os"
 	"os/user"
 	"strings"
@@ -28,7 +27,6 @@ func expandTilde(path string) string {
 	if strings.HasPrefix(path, "~") {
 		usr, err := user.Current()
 		if err != nil {
-			log.Println("Failure reading config")
 			os.Exit(1)
 		}
 		return strings.Replace(path, "~", usr.HomeDir, 1)

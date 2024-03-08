@@ -1,6 +1,8 @@
 package model
 
 import (
+	"github.com/aws/aws-sdk-go-v2/aws"
+
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -11,7 +13,13 @@ const (
 	cfStacksList stateView = iota
 )
 
+type awsConfig struct {
+	config aws.Config
+	err    error
+}
+
 type model struct {
+	awsConfigs     map[string]awsConfig
 	state          stateView
 	stacksList     list.Model
 	message        string
