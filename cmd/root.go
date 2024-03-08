@@ -23,14 +23,24 @@ func Execute() {
 		defaultConfigFilePath = fmt.Sprintf("%s/.config/outtasync.yml", currentUser.HomeDir)
 	}
 	configFilePath := flag.String("config-file", defaultConfigFilePath, "path of the config file")
-	profiles := flag.String("profiles", "", "profiles to filter for")
+	profiles := flag.String("profiles", "", "comma separated string of profiles to filter for")
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\nFlags:\n", helpText)
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
 
+	if *configFilePath == "" {
+		die("config-file cannot be empty")
+	}
+
 	_, err = os.Stat(*configFilePath)
 	if os.IsNotExist(err) {
-		die("Error: file not found at %s\n", *configFilePath)
+		die(cfgErrSuggestion(fmt.Sprintf("Error: file doesn't exist at %q", *configFilePath)))
 	}
+
 	var profilesToFetch []string
 	if *profiles != "" {
 		profilesToFetch = strings.Split(*profiles, ",")
@@ -38,10 +48,10 @@ func Execute() {
 
 	stacks, err := ReadConfig(*configFilePath, profilesToFetch)
 	if err != nil {
-		die("Error reading config: %v\n", err)
+		die(cfgErrSuggestion(fmt.Sprintf("Error reading config: %v", *configFilePath)))
 	}
 	if len(stacks) == 0 {
-		die("No stacks found for the requested parameters")
+		die(cfgErrSuggestion(fmt.Sprintf("No stacks found for the requested parameters")))
 	}
 	ui.RenderUI(stacks)
 
