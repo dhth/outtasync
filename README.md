@@ -85,6 +85,12 @@ outtasync -profiles qa,prod
 
 4. Press `?` to view keyboard shortcuts to use the TUI.
 
+TODO
+---
+
+- [ ] Add a command to generate a sample config file
+- [ ] Add CLI mode
+
 Acknowledgements
 ---
 

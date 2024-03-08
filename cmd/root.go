@@ -26,7 +26,7 @@ func Execute() {
 	profiles := flag.String("profiles", "", "comma separated string of profiles to filter for")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "%s\nFlags:\n", helpText)
+		fmt.Fprintf(os.Stderr, "%s\n\nFlags:\n", helpText)
 		flag.PrintDefaults()
 	}
 
