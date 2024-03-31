@@ -5,10 +5,9 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/dhth/outtasync/model"
 )
 
-func RenderUI(stacks []model.Stack) {
+func RenderUI(stacks []Stack, awsCfgs map[string]AwsConfig) {
 	if len(os.Getenv("DEBUG")) > 0 {
 		f, err := tea.LogToFile("debug.log", "debug")
 		if err != nil {
@@ -18,7 +17,7 @@ func RenderUI(stacks []model.Stack) {
 		defer f.Close()
 	}
 
-	p := tea.NewProgram(model.InitialModel(stacks), tea.WithAltScreen())
+	p := tea.NewProgram(InitialModel(stacks, awsCfgs), tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there has been an error: %v", err)
 		os.Exit(1)

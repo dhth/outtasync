@@ -1,8 +1,9 @@
-package model
+package ui
 
 import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -13,13 +14,18 @@ const (
 	cfStacksList stateView = iota
 )
 
-type awsConfig struct {
-	config aws.Config
-	err    error
+type AwsConfig struct {
+	Config aws.Config
+	Err    error
+}
+
+type AwsCFClient struct {
+	Client *cloudformation.Client
+	Err    error
 }
 
 type model struct {
-	awsConfigs     map[string]awsConfig
+	awsConfigs     map[string]AwsConfig
 	state          stateView
 	stacksList     list.Model
 	message        string

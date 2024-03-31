@@ -1,4 +1,4 @@
-package model
+package ui
 
 import (
 	"github.com/charmbracelet/bubbles/key"
@@ -38,8 +38,8 @@ func newAppItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 
 	d.Styles.SelectedTitle = d.Styles.
 		SelectedTitle.
-		Foreground(lipgloss.Color("#fe8019")).
-		BorderLeftForeground(lipgloss.Color("#fe8019"))
+		Foreground(lipgloss.Color(StackListColor)).
+		BorderLeftForeground(lipgloss.Color(StackListColor))
 	d.Styles.SelectedDesc = d.Styles.
 		SelectedTitle.
 		Copy()

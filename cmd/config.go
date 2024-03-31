@@ -5,7 +5,7 @@ import (
 	"os/user"
 	"strings"
 
-	"github.com/dhth/outtasync/model"
+	"github.com/dhth/outtasync/ui"
 	"gopkg.in/yaml.v3"
 )
 
@@ -34,7 +34,7 @@ func expandTilde(path string) string {
 	return path
 }
 
-func ReadConfig(configFilePath string, profilesToFetch []string) ([]model.Stack, error) {
+func ReadConfig(configFilePath string, profilesToFetch []string) ([]ui.Stack, error) {
 	localFile, err := os.ReadFile(expandTilde(configFilePath))
 	if err != nil {
 		os.Exit(1)
@@ -50,7 +50,7 @@ func ReadConfig(configFilePath string, profilesToFetch []string) ([]model.Stack,
 	}
 
 	globalRefreshCmd := t.GlobalRefreshCommand
-	var rows []model.Stack
+	var rows []ui.Stack
 	for _, profile := range t.Profiles {
 		if len(profilesToFetch) > 0 && !profilesMap[profile.Name] {
 			continue
@@ -62,7 +62,7 @@ func ReadConfig(configFilePath string, profilesToFetch []string) ([]model.Stack,
 			} else {
 				refreshCmd = globalRefreshCmd
 			}
-			rows = append(rows, model.Stack{
+			rows = append(rows, ui.Stack{
 				Name:           stack.Name,
 				AwsProfile:     profile.Name,
 				AwsRegion:      stack.Region,
@@ -70,7 +70,7 @@ func ReadConfig(configFilePath string, profilesToFetch []string) ([]model.Stack,
 				Local:          expandTilde(stack.Local),
 				Tag:            stack.Tag,
 				RefreshCommand: refreshCmd,
-				FetchStatus:    model.StatusUnfetched,
+				FetchStatus:    ui.StatusUnfetched,
 				OuttaSync:      false,
 				Err:            nil,
 			})

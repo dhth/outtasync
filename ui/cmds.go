@@ -1,4 +1,4 @@
-package model
+package ui
 
 import (
 	"fmt"
@@ -50,4 +50,15 @@ func showFile(filePath string) tea.Cmd {
 		}
 		return tea.Msg(ShowFileFinished{})
 	})
+}
+
+func getCFTemplateBody(awsConfig AwsConfig, index int, stack Stack) tea.Cmd {
+	return func() tea.Msg {
+		stackSyncStatus := CheckStackSyncStatus(awsConfig, stack)
+
+		if awsConfig.Err != nil {
+			return TemplateFetchedMsg{index, stack, "", false, awsConfig.Err}
+		}
+		return TemplateFetchedMsg{index, stack, stackSyncStatus.TemplateBody, stackSyncStatus.Outtasync, stackSyncStatus.Err}
+	}
 }

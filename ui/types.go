@@ -1,4 +1,4 @@
-package model
+package ui
 
 import (
 	"fmt"
@@ -60,4 +60,11 @@ type delegateKeyMap struct {
 	chooseAll          key.Binding
 	refreshCredentials key.Binding
 	showDiff           key.Binding
+}
+
+type StackSyncResult struct {
+	Stack        Stack
+	TemplateBody string
+	Outtasync    bool
+	Err          error
 }

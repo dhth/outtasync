@@ -36,36 +36,37 @@ go install github.com/dhth/outtasync@latest
     - `outtasync` doesn't change or override git's pager, so the diff will
         follow your `.gitconfig` settings (if present).
 
-⚡️ Usage
+🛠️ Configuration
 ---
 
-1. Create a configuration file that looks like the following.
+Create a configuration file that looks like the following. By default,
+`outtasync` will look for this file at `~/.config/outtasync.yml`.
 
-    ```yaml
-    globalRefreshCommand: aws sso login --sso-session sessionname
-    profiles:
-    - name: qa
-      stacks:
-      - name: bingo-service-qa
-        local: ~/projects/bingo-service/cloudformation/infrastructure.yml
-        region: eu-central-1
-        refreshCommand: aws sso login --profile qa1
-      - name: papaya-service-qa
-        local: ~/projects/papaya-service/cloudformation/service.yml
-        region: eu-central-1
-      - name: racoon-service-qa
-        local: ~/projects/racoon-service/cloudformation/service.yml
-        region: eu-central-1
-    - name: prod
-      stacks:
-      - name: brb-dll-prod
-        local: ~/projects/brd-dll-service/cloudformation/service.yml
-        region: eu-central-1
-        refreshCommand: aws sso login --profile rgb-prod
-      - name: galactus-service-prod
-        local: ~/projects/galactus-service/cloudformation/service.yml
-        region: eu-central-1
-    ```
+```yaml
+globalRefreshCommand: aws sso login --sso-session sessionname
+profiles:
+- name: qa
+  stacks:
+  - name: bingo-service-qa
+    local: ~/projects/bingo-service/cloudformation/infrastructure.yml
+    region: eu-central-1
+    refreshCommand: aws sso login --profile qa1
+  - name: papaya-service-qa
+    local: ~/projects/papaya-service/cloudformation/service.yml
+    region: eu-central-1
+  - name: racoon-service-qa
+    local: ~/projects/racoon-service/cloudformation/service.yml
+    region: eu-central-1
+- name: prod
+  stacks:
+  - name: brb-dll-prod
+    local: ~/projects/brd-dll-service/cloudformation/service.yml
+    region: eu-central-1
+    refreshCommand: aws sso login --profile rgb-prod
+  - name: galactus-service-prod
+    local: ~/projects/galactus-service/cloudformation/service.yml
+    region: eu-central-1
+```
 
 `refreshCommand` overrides `globalRefreshCommand` whereever set.
 
@@ -73,9 +74,8 @@ go install github.com/dhth/outtasync@latest
 if you want to invoke the command that refreshes your AWS credentials via the
 TUI directly.*
 
-2. Place this file at `~/.config/outtasync.yml` *(optional)*
-
-3. Run the TUI as follows:
+⚡️ Usage
+---
 
 ```bash
 outtasync
@@ -83,13 +83,14 @@ outtasync -config-file /path/to/config.yml
 outtasync -profiles qa,prod
 ```
 
-4. Press `?` to view keyboard shortcuts to use the TUI.
+By default, `outtasync` runs in TUI mode. You can also run it in CLI mode (where
+it outputs the results to stdout) using `-mode=cli` flag.
 
 TODO
 ---
 
 - [ ] Add a command to generate a sample config file
-- [ ] Add CLI mode
+- [x] Add CLI mode
 
 Acknowledgements
 ---

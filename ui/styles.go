@@ -1,7 +1,12 @@
-package model
+package ui
 
 import (
 	"github.com/charmbracelet/lipgloss"
+)
+
+const (
+	DefaultBackgroundColor = "#282828"
+	StackListColor         = "#fe8019"
 )
 
 var (

@@ -1,4 +1,4 @@
-package model
+package ui
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case CheckStackStatus:
 		msg.stack.FetchStatus = StatusFetching
 		m.stacksList.SetItem(msg.index, msg.stack)
-		return m, GetCFTemplateBody(m.awsConfigs[getAWSConfigKey(msg.stack)], msg.index, msg.stack)
+		return m, getCFTemplateBody(m.awsConfigs[GetAWSConfigKey(msg.stack)], msg.index, msg.stack)
 	case TemplateFetchedMsg:
 		if msg.err != nil {
 			msg.stack.Err = msg.err

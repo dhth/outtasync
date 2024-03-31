@@ -1,4 +1,4 @@
-package model
+package ui
 
 type DiffFinishedMsg struct{ err error }
 type ShowErrorFinishedMsg struct{ err error }

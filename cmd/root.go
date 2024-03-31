@@ -8,6 +8,7 @@ import (
 
 	"flag"
 
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/dhth/outtasync/ui"
 )
 
@@ -15,6 +16,10 @@ func die(msg string, args ...any) {
 	fmt.Fprintf(os.Stderr, msg+"\n", args...)
 	os.Exit(1)
 }
+
+var (
+	mode = flag.String("mode", "tui", "the mode to use; possible values: tui/cli")
+)
 
 func Execute() {
 	currentUser, err := user.Current()
@@ -31,6 +36,10 @@ func Execute() {
 	}
 
 	flag.Parse()
+
+	if *mode == "" {
+		die("mode cannot be empty")
+	}
 
 	if *configFilePath == "" {
 		die("config-file cannot be empty")
@@ -53,6 +62,30 @@ func Execute() {
 	if len(stacks) == 0 {
 		die(cfgErrSuggestion(fmt.Sprintf("No stacks found for the requested parameters")))
 	}
-	ui.RenderUI(stacks)
+
+	awsCfgs := make(map[string]ui.AwsConfig)
+	cfClients := make(map[string]ui.AwsCFClient)
+
+	seen := make(map[string]bool)
+	for _, stack := range stacks {
+		configKey := ui.GetAWSConfigKey(stack)
+		if !seen[configKey] {
+			cfg, err := ui.GetAWSConfig(stack.AwsProfile, stack.AwsRegion)
+			awsCfgs[configKey] = ui.AwsConfig{Config: cfg, Err: err}
+			seen[configKey] = true
+			if err != nil {
+				cfClients[configKey] = ui.AwsCFClient{Err: err}
+			} else {
+				cfClients[configKey] = ui.AwsCFClient{Client: cloudformation.NewFromConfig(cfg)}
+			}
+		}
+	}
+
+	switch *mode {
+	case "tui":
+		ui.RenderUI(stacks, awsCfgs)
+	case "cli":
+		ui.ShowResults(stacks, awsCfgs)
+	}
 
 }

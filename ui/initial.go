@@ -1,22 +1,15 @@
-package model
+package ui
 
 import (
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/lipgloss"
 )
 
-func InitialModel(stacks []Stack) model {
+func InitialModel(stacks []Stack, awsCfgs map[string]AwsConfig) model {
 	stackItems := make([]list.Item, 0, len(stacks))
-	awsCfgs := make(map[string]awsConfig)
 
-	seen := make(map[string]bool)
 	for _, stack := range stacks {
 		stackItems = append(stackItems, stack)
-		configKey := getAWSConfigKey(stack)
-		if !seen[configKey] {
-			cfg, err := getAWSConfig(stack.AwsProfile, stack.AwsRegion)
-			awsCfgs[configKey] = awsConfig{cfg, err}
-			seen[configKey] = true
-		}
 	}
 
 	var appDelegateKeys = newAppDelegateKeyMap()
@@ -29,6 +22,9 @@ func InitialModel(stacks []Stack) model {
 	m.stacksList.Title = "Stacks"
 	m.stacksList.SetStatusBarItemName("stack", "stacks")
 	m.stacksList.DisableQuitKeybindings()
+	m.stacksList.Styles.Title.Background(lipgloss.Color(StackListColor))
+	m.stacksList.Styles.Title.Foreground(lipgloss.Color(DefaultBackgroundColor))
+	m.stacksList.Styles.Title.Bold(true)
 
 	return m
 }
