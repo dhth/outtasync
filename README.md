@@ -60,7 +60,7 @@ profiles:
 - name: prod
   stacks:
   - name: brb-dll-prod
-    local: ~/projects/brd-dll-service/cloudformation/service.yml
+    local: ~/projects/brb-dll-service/cloudformation/service.yml
     region: eu-central-1
     refreshCommand: aws sso login --profile rgb-prod
   - name: galactus-service-prod
@@ -77,14 +77,41 @@ TUI directly.*
 ⚡️ Usage
 ---
 
+`outtasync` can run in two modes: A TUI mode (ideal for running locally), and a
+CLI mode (ideal for running in a CI pipeline). TUI mode is the default.
+
+### TUI Mode
+
 ```bash
 outtasync
 outtasync -config-file /path/to/config.yml
 outtasync -profiles qa,prod
 ```
 
-By default, `outtasync` runs in TUI mode. You can also run it in CLI mode (where
-it outputs the results to stdout) using `-mode=cli` flag.
+### CLI Mode
+
+```bash
+outtasync -mode=cli
+```
+
+This will print an output like the following to stdout.
+
+```
+2 stacks are outtasync:
+
+qa:eu-central-1:bingo-service-qa
+prod:eu-central-1:galactus-service-prod
+```
+
+### Downloading in a CI pipeline
+
+`outtasync` can be downloaded from Github releases and used as follows:
+
+```bash
+curl -s -OL https://github.com/dhth/outtasync/releases/download/v0.3.0/outtasync_v0.3.0_linux_amd64.tar.gz
+tar -xzvf outtasync_v0.3.0_linux_amd64.tar.gz
+./outtasync -mode=cli
+```
 
 TODO
 ---
