@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"regexp"
 	"strings"
 
 	"flag"
@@ -18,7 +19,8 @@ func die(msg string, args ...any) {
 }
 
 var (
-	mode = flag.String("mode", "tui", "the mode to use; possible values: tui/cli")
+	mode    = flag.String("mode", "tui", "the mode to use; possible values: tui/cli")
+	pattern = flag.String("p", "", "regex pattern to filter stack names")
 )
 
 func Execute() {
@@ -45,6 +47,15 @@ func Execute() {
 		die("config-file cannot be empty")
 	}
 
+	var regexPattern *regexp.Regexp
+
+	if *pattern != "" {
+		regexPattern, err = regexp.Compile(*pattern)
+		if err != nil {
+			die("Incorrect regex pattern provided: %q\n", err)
+		}
+	}
+
 	_, err = os.Stat(*configFilePath)
 	if os.IsNotExist(err) {
 		die(cfgErrSuggestion(fmt.Sprintf("Error: file doesn't exist at %q", *configFilePath)))
@@ -55,12 +66,12 @@ func Execute() {
 		profilesToFetch = strings.Split(*profiles, ",")
 	}
 
-	stacks, err := ReadConfig(*configFilePath, profilesToFetch)
+	stacks, err := ReadConfig(*configFilePath, profilesToFetch, regexPattern)
 	if err != nil {
 		die(cfgErrSuggestion(fmt.Sprintf("Error reading config: %v", *configFilePath)))
 	}
 	if len(stacks) == 0 {
-		die(cfgErrSuggestion(fmt.Sprintf("No stacks found for the requested parameters")))
+		die("No stacks found for the requested parameters")
 	}
 
 	awsCfgs := make(map[string]ui.AwsConfig)

@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 	"os/user"
+	"regexp"
 	"strings"
 
 	"github.com/dhth/outtasync/ui"
@@ -34,7 +35,7 @@ func expandTilde(path string) string {
 	return path
 }
 
-func ReadConfig(configFilePath string, profilesToFetch []string) ([]ui.Stack, error) {
+func ReadConfig(configFilePath string, profilesToFetch []string, pattern *regexp.Regexp) ([]ui.Stack, error) {
 	localFile, err := os.ReadFile(expandTilde(configFilePath))
 	if err != nil {
 		os.Exit(1)
@@ -56,6 +57,9 @@ func ReadConfig(configFilePath string, profilesToFetch []string) ([]ui.Stack, er
 			continue
 		}
 		for _, stack := range profile.Stacks {
+			if pattern != nil && !pattern.MatchString(stack.Name) {
+				continue
+			}
 			var refreshCmd string
 			if stack.RefreshCommand != nil {
 				refreshCmd = *stack.RefreshCommand

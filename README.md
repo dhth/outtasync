@@ -86,6 +86,8 @@ CLI mode (ideal for running in a CI pipeline). TUI mode is the default.
 outtasync
 outtasync -config-file /path/to/config.yml
 outtasync -profiles qa,prod
+outtasync -p '<regex-pattern-for-stack-names>'
+outtasync -p '.*(qa|staging)$'
 ```
 
 ### CLI Mode
