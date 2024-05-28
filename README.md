@@ -9,9 +9,7 @@ This can occur when someone updates a stack but fails to commit the latest stack
 file to the codebase. Alternatively, it may happen when a stack is updated on
 one deployment environment but not on others. 🤷
 
-<p align="center">
-  <img src="https://tools.dhruvs.space/images/outtasync/outtasync.gif" alt="Usage" />
-</p>
+[![Demo Video](https://tools.dhruvs.space/images/outtasync/outtasync-video-1.png)](https://www.youtube.com/watch?v=BjJcBquIyk8)
 
 💾 Installation
 ---
@@ -136,6 +134,15 @@ q                                    return to previous page/quit
 /                                    filter
 ?                                    show/close help
 ```
+
+🖥️ Screenshots
+---
+
+![Usage-1](https://tools.dhruvs.space/images/outtasync/outtasync-1.png)
+
+![Usage-2](https://tools.dhruvs.space/images/outtasync/outtasync-2.png)
+
+![Usage-3](https://tools.dhruvs.space/images/outtasync/outtasync-3.png)
 
 TODO
 ---
