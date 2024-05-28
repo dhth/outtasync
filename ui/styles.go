@@ -5,24 +5,34 @@ import (
 )
 
 const (
-	DefaultBackgroundColor = "#282828"
-	StackListColor         = "#fe8019"
+	defaultBackgroundColor = "#282828"
+	stackListColor         = "#fe8019"
+	modeColor              = "#b8bb26"
+	fetchingColor          = "#ebdbb2"
+	inSyncColor            = "#b8bb26"
+	outtaSyncColor         = "#fb4934"
+	errorColor             = "#928374"
 )
 
 var (
 	baseStyle = lipgloss.NewStyle().
 			PaddingLeft(1).
 			PaddingRight(1).
-			Foreground(lipgloss.Color("#282828"))
+			Foreground(lipgloss.Color(defaultBackgroundColor))
 
-	baseListStyle = lipgloss.NewStyle().PaddingTop(1).PaddingRight(2).PaddingLeft(1).PaddingBottom(1).Width(listWidth + 10)
+	baseListStyle = lipgloss.NewStyle().
+			PaddingTop(1).
+			PaddingRight(2).
+			PaddingLeft(1).
+			PaddingBottom(1).
+			Width(listWidth + 10)
 
 	stackListStyle = baseListStyle.Copy()
 
 	modeStyle = baseStyle.Copy().
 			Align(lipgloss.Center).
 			Bold(true).
-			Background(lipgloss.Color("#b8bb26"))
+			Background(lipgloss.Color(modeColor))
 
 	driftStatusStyle = baseStyle.Copy().
 				Bold(true).
@@ -30,24 +40,24 @@ var (
 				Width(12)
 
 	fetchingStyle = driftStatusStyle.Copy().
-			Background(lipgloss.Color("#ebdbb2"))
+			Background(lipgloss.Color(fetchingColor))
 
 	insSyncStyle = driftStatusStyle.Copy().
-			Background(lipgloss.Color("#b8bb26"))
+			Background(lipgloss.Color(inSyncColor))
 
 	outtaSyncStyle = driftStatusStyle.Copy().
-			Background(lipgloss.Color("#fb4934"))
+			Background(lipgloss.Color(outtaSyncColor))
 
 	errorStyle = driftStatusStyle.Copy().
-			Background(lipgloss.Color("#928374"))
+			Background(lipgloss.Color(errorColor))
 
 	msgStyle = lipgloss.NewStyle().
 			PaddingLeft(2).
 			Bold(true)
 
 	outtaSyncMsgStyle = msgStyle.Copy().
-				Foreground(lipgloss.Color("#fb4934"))
+				Foreground(lipgloss.Color(outtaSyncColor))
 
 	errorMsgStyle = msgStyle.Copy().
-			Foreground(lipgloss.Color("#928374"))
+			Foreground(lipgloss.Color(errorColor))
 )

@@ -21,7 +21,7 @@ func die(msg string, args ...any) {
 var (
 	mode         = flag.String("mode", "tui", "the mode to use; possible values: tui/cli")
 	pattern      = flag.String("p", "", "regex pattern to filter stack names")
-	checkOnStart = flag.Bool("s", false, "whether to check status for all stacks on startup")
+	checkOnStart = flag.Bool("c", false, "whether to check status for all stacks on startup")
 )
 
 func Execute() {

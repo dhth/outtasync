@@ -38,8 +38,8 @@ func newAppItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 
 	d.Styles.SelectedTitle = d.Styles.
 		SelectedTitle.
-		Foreground(lipgloss.Color(StackListColor)).
-		BorderLeftForeground(lipgloss.Color(StackListColor))
+		Foreground(lipgloss.Color(stackListColor)).
+		BorderLeftForeground(lipgloss.Color(stackListColor))
 	d.Styles.SelectedDesc = d.Styles.
 		SelectedTitle.
 		Copy()
