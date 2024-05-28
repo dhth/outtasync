@@ -10,7 +10,7 @@ import (
 	"flag"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
-	"github.com/dhth/outtasync/ui"
+	"github.com/dhth/outtasync/internal/ui"
 )
 
 func die(msg string, args ...any) {

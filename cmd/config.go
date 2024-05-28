@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/dhth/outtasync/ui"
+	"github.com/dhth/outtasync/internal/ui"
 	"gopkg.in/yaml.v3"
 )
 
