@@ -88,6 +88,7 @@ outtasync -config-file /path/to/config.yml
 outtasync -profiles qa,prod
 outtasync -p '<regex-pattern-for-stack-names>'
 outtasync -p '.*(qa|staging)$'
+outtasync -s # to check status for all stacks on startup
 ```
 
 ### CLI Mode

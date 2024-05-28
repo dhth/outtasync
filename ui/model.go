@@ -28,13 +28,26 @@ type model struct {
 	awsConfigs     map[string]AwsConfig
 	state          stateView
 	stacksList     list.Model
+	outtaSyncMap   map[int]int
+	checkOnStart   bool
 	message        string
 	errorMessage   string
 	terminalHeight int
 	terminalWidth  int
 	err            error
+	outtaSyncNum   uint
+	errorNum       uint
 }
 
 func (m model) Init() tea.Cmd {
-	return nil
+
+	var cmds []tea.Cmd
+	if m.checkOnStart {
+		for i, stack := range m.stacksList.Items() {
+			if st, ok := stack.(Stack); ok {
+				cmds = append(cmds, StackChosen(i, st))
+			}
+		}
+	}
+	return tea.Batch(cmds...)
 }

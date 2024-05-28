@@ -31,8 +31,21 @@ func (m model) View() string {
 	footerStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#282828")).
 		Background(lipgloss.Color("#7c6f64"))
-	footerStr := fmt.Sprintf("%s %s",
+
+	var outtaSyncMsg string
+	var errorCountMsg string
+
+	if m.outtaSyncNum > 0 {
+		outtaSyncMsg = outtaSyncMsgStyle.Render(fmt.Sprintf("%d❗", m.outtaSyncNum))
+	}
+	if m.errorNum > 0 {
+		errorCountMsg = errorMsgStyle.Render(fmt.Sprintf("%d 😵", m.errorNum))
+	}
+
+	footerStr := fmt.Sprintf("%s%s%s  %s",
 		modeStyle.Render("outtasync"),
+		outtaSyncMsg,
+		errorCountMsg,
 		errorMsg,
 	)
 	footer = footerStyle.Render(footerStr)

@@ -35,13 +35,31 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			msg.stack.Err = msg.err
 			msg.stack.FetchStatus = StatusFailure
 			m.stacksList.SetItem(msg.index, msg.stack)
+			m.outtaSyncMap[msg.index] = -2
 		} else {
 			msg.stack.OuttaSync = true
 			msg.stack.FetchStatus = StatusFetched
 			msg.stack.OuttaSync = msg.outtaSync
+			switch msg.outtaSync {
+			case true:
+				m.outtaSyncMap[msg.index] = 1
+			case false:
+				m.outtaSyncMap[msg.index] = 0
+			}
 			msg.stack.Template = msg.template
 			msg.stack.Err = nil
 			m.stacksList.SetItem(msg.index, msg.stack)
+		}
+
+		// recompute outtasync and error numbers
+		m.outtaSyncNum = 0
+		m.errorNum = 0
+		for _, v := range m.outtaSyncMap {
+			if v == 1 {
+				m.outtaSyncNum++
+			} else if v == -2 {
+				m.errorNum++
+			}
 		}
 	case ShowFileFinished:
 		if msg.err != nil {

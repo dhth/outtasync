@@ -40,4 +40,14 @@ var (
 
 	errorStyle = driftStatusStyle.Copy().
 			Background(lipgloss.Color("#928374"))
+
+	msgStyle = lipgloss.NewStyle().
+			PaddingLeft(2).
+			Bold(true)
+
+	outtaSyncMsgStyle = msgStyle.Copy().
+				Foreground(lipgloss.Color("#fb4934"))
+
+	errorMsgStyle = msgStyle.Copy().
+			Foreground(lipgloss.Color("#928374"))
 )
