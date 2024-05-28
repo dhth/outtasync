@@ -13,3 +13,4 @@ type TemplateFetchedMsg struct {
 	outtaSync bool
 	err       error
 }
+type hideHelpMsg struct{}

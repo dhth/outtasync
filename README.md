@@ -116,6 +116,28 @@ tar -xzvf outtasync_v0.3.0_linux_amd64.tar.gz
 ./outtasync -mode=cli
 ```
 
+Keymaps
+---
+
+```
+↑/k                                  up
+↓/j                                  down
+→/l/pgdn                             next page
+←/h/pgup                             prev page
+g/home                               go to start
+G/end                                go to end
+ctrl+f/enter                         check status
+a                                    check status for all
+r                                    refresh aws credentials
+ctrl+d/v                             show diff
+o                                    filter outtasync stacks
+i                                    filter in-sync stacks
+e                                    filter stacks with errors
+q                                    return to previous page/quit
+/                                    filter
+?                                    show/close help
+```
+
 TODO
 ---
 

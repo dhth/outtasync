@@ -12,6 +12,7 @@ const (
 	inSyncColor            = "#b8bb26"
 	outtaSyncColor         = "#fb4934"
 	errorColor             = "#928374"
+	helpMsgColor           = "#83a598"
 )
 
 var (
@@ -60,4 +61,9 @@ var (
 
 	errorMsgStyle = msgStyle.Copy().
 			Foreground(lipgloss.Color(errorColor))
+
+	helpMsgStyle = baseStyle.Copy().
+			Bold(true).
+			PaddingLeft(2).
+			Foreground(lipgloss.Color(helpMsgColor))
 )

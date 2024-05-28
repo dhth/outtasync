@@ -15,6 +15,15 @@ const (
 	StatusFailure
 )
 
+type stackResult uint
+
+const (
+	stackResultErr stackResult = iota
+	stackResultUnchecked
+	stackResultInSync
+	stackResultOuttaSync
+)
+
 type Stack struct {
 	Name           string
 	AwsProfile     string
@@ -60,6 +69,10 @@ type delegateKeyMap struct {
 	chooseAll          key.Binding
 	refreshCredentials key.Binding
 	showDiff           key.Binding
+	filterOuttaSync    key.Binding
+	filterInSync       key.Binding
+	filterErrors       key.Binding
+	close              key.Binding
 }
 
 type StackSyncResult struct {

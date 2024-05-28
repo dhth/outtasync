@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -61,4 +62,10 @@ func getCFTemplateBody(awsConfig AwsConfig, index int, stack Stack) tea.Cmd {
 		}
 		return TemplateFetchedMsg{index, stack, stackSyncStatus.TemplateBody, stackSyncStatus.Outtasync, stackSyncStatus.Err}
 	}
+}
+
+func hideHelp(interval time.Duration) tea.Cmd {
+	return tea.Tick(interval, func(time.Time) tea.Msg {
+		return hideHelpMsg{}
+	})
 }

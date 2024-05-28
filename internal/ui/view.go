@@ -42,8 +42,14 @@ func (m model) View() string {
 		errorCountMsg = errorMsgStyle.Render(fmt.Sprintf("%d 😵", m.errorNum))
 	}
 
-	footerStr := fmt.Sprintf("%s%s%s  %s",
+	var helpMsg string
+	if m.showHelp {
+		helpMsg = helpMsgStyle.Render("press ? for help")
+	}
+
+	footerStr := fmt.Sprintf("%s%s%s%s  %s",
 		modeStyle.Render("outtasync"),
+		helpMsg,
 		outtaSyncMsg,
 		errorCountMsg,
 		errorMsg,

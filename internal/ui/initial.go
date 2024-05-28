@@ -6,16 +6,12 @@ import (
 )
 
 func InitialModel(stacks []Stack, awsCfgs map[string]AwsConfig, checkOnStart bool) model {
-	stackItems := make([]list.Item, 0, len(stacks))
+	stackItems := make([]list.Item, len(stacks))
 
-	// -2: error
-	// -1: not checked
-	//  0: in sync
-	//  1: outtasync
-	outtaSyncMap := make(map[int]int)
+	resultMap := make(map[int]stackResult)
 	for i, stack := range stacks {
-		stackItems = append(stackItems, stack)
-		outtaSyncMap[i] = -1
+		stackItems[i] = stack
+		resultMap[i] = stackResultUnchecked
 	}
 
 	var appDelegateKeys = newAppDelegateKeyMap()
@@ -25,8 +21,10 @@ func InitialModel(stacks []Stack, awsCfgs map[string]AwsConfig, checkOnStart boo
 		awsConfigs:   awsCfgs,
 		stacksList:   list.New(stackItems, appDelegate, listWidth, 0),
 		checkOnStart: checkOnStart,
-		outtaSyncMap: outtaSyncMap,
+		resultMap:    resultMap,
+		showHelp:     true,
 	}
+	m.stacksListReserve = m.stacksList.Items()
 	m.stacksList.Title = "Stacks"
 	m.stacksList.SetStatusBarItemName("stack", "stacks")
 	m.stacksList.DisableQuitKeybindings()

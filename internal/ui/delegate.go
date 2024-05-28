@@ -25,6 +25,22 @@ func newAppDelegateKeyMap() *delegateKeyMap {
 			key.WithKeys("ctrl+d", "v"),
 			key.WithHelp("ctrl+d/v", "show diff"),
 		),
+		filterOuttaSync: key.NewBinding(
+			key.WithKeys("o"),
+			key.WithHelp("o", "filter outtasync stacks"),
+		),
+		filterInSync: key.NewBinding(
+			key.WithKeys("i"),
+			key.WithHelp("i", "filter in-sync stacks"),
+		),
+		filterErrors: key.NewBinding(
+			key.WithKeys("e"),
+			key.WithHelp("e", "filter stacks with errors"),
+		),
+		close: key.NewBinding(
+			key.WithKeys("q"),
+			key.WithHelp("q", "return to previous page/quit"),
+		),
 	}
 }
 
@@ -96,7 +112,16 @@ func newAppItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 		}
 		return nil
 	}
-	help := []key.Binding{keys.choose, keys.chooseAll, keys.refreshCredentials, keys.showDiff}
+	help := []key.Binding{
+		keys.choose,
+		keys.chooseAll,
+		keys.refreshCredentials,
+		keys.showDiff,
+		keys.filterOuttaSync,
+		keys.filterInSync,
+		keys.filterErrors,
+		keys.close,
+	}
 
 	d.ShortHelpFunc = func() []key.Binding {
 		return help

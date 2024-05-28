@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"time"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
@@ -14,6 +16,15 @@ const (
 	cfStacksList stateView = iota
 )
 
+type stackFilter uint
+
+const (
+	stacksFilterAll stackFilter = iota
+	stacksFilterErr
+	stacksFilterOuttaSync
+	stacksFilterInSync
+)
+
 type AwsConfig struct {
 	Config aws.Config
 	Err    error
@@ -25,23 +36,29 @@ type AwsCFClient struct {
 }
 
 type model struct {
-	awsConfigs     map[string]AwsConfig
-	state          stateView
-	stacksList     list.Model
-	outtaSyncMap   map[int]int
-	checkOnStart   bool
-	message        string
-	errorMessage   string
-	terminalHeight int
-	terminalWidth  int
-	err            error
-	outtaSyncNum   uint
-	errorNum       uint
+	awsConfigs        map[string]AwsConfig
+	state             stateView
+	stacksList        list.Model
+	stacksListReserve []list.Item
+	stacksFilter      stackFilter
+	resultMap         map[int]stackResult
+	checkOnStart      bool
+	message           string
+	errorMessage      string
+	terminalHeight    int
+	terminalWidth     int
+	err               error
+	outtaSyncNum      uint
+	errorNum          uint
+	showHelp          bool
 }
 
 func (m model) Init() tea.Cmd {
 
 	var cmds []tea.Cmd
+
+	cmds = append(cmds, hideHelp(time.Minute*1))
+
 	if m.checkOnStart {
 		for i, stack := range m.stacksList.Items() {
 			if st, ok := stack.(Stack); ok {
