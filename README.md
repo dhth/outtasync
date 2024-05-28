@@ -10,9 +10,8 @@ file to the codebase. Alternatively, it may happen when a stack is updated on
 one deployment environment but not on others. 🤷
 
 <p align="center">
-  <img src="./outtasync.gif?raw=true" alt="Usage" />
+  <img src="https://tools.dhruvs.space/images/outtasync/outtasync.gif" alt="Usage" />
 </p>
-
 
 💾 Installation
 ---
@@ -116,7 +115,7 @@ tar -xzvf outtasync_v0.3.0_linux_amd64.tar.gz
 ./outtasync -mode=cli
 ```
 
-Keymaps
+⌨️ Keymaps
 ---
 
 ```
