@@ -8,10 +8,10 @@ import (
 func InitialModel(stacks []Stack, awsCfgs map[string]AwsConfig, checkOnStart bool) model {
 	stackItems := make([]list.Item, len(stacks))
 
-	resultMap := make(map[int]stackResult)
+	stackReserve := make(map[string]Stack)
 	for i, stack := range stacks {
 		stackItems[i] = stack
-		resultMap[i] = stackResultUnchecked
+		stackReserve[stack.key()] = stack
 	}
 
 	var appDelegateKeys = newAppDelegateKeyMap()
@@ -21,10 +21,9 @@ func InitialModel(stacks []Stack, awsCfgs map[string]AwsConfig, checkOnStart boo
 		awsConfigs:   awsCfgs,
 		stacksList:   list.New(stackItems, appDelegate, listWidth, 0),
 		checkOnStart: checkOnStart,
-		resultMap:    resultMap,
 		showHelp:     true,
 	}
-	m.stacksListReserve = m.stacksList.Items()
+	m.stacksListReserve = stackReserve
 	m.stacksList.Title = "Stacks"
 	m.stacksList.SetStatusBarItemName("stack", "stacks")
 	m.stacksList.DisableQuitKeybindings()

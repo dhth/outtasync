@@ -28,7 +28,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if fs == list.Filtering || fs == list.FilterApplied {
 				m.stacksList.ResetFilter()
 			} else if m.stacksFilter != stacksFilterAll {
-				m.stacksList.SetItems(m.stacksListReserve)
+				var allItems []list.Item
+				for _, st := range m.stacksListReserve {
+					allItems = append(allItems, st)
+				}
+				m.stacksList.SetItems(allItems)
 				m.stacksList.Title = "stacks"
 				m.stacksFilter = stacksFilterAll
 				m.stacksList.Styles.Title.Background(lipgloss.Color(stackListColor))
@@ -38,12 +42,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "o":
 			if m.stacksFilter != stacksFilterOuttaSync {
 				filteredItems := make([]list.Item, 0)
-				for _, item := range m.stacksListReserve {
-					stackItem, ok := item.(Stack)
-					if ok {
-						if stackItem.FetchStatus == StatusFetched && stackItem.OuttaSync {
-							filteredItems = append(filteredItems, item)
-						}
+				for _, st := range m.stacksListReserve {
+					if st.FetchStatus == StatusFetched && st.OuttaSync {
+						filteredItems = append(filteredItems, st)
 					}
 				}
 				m.stacksList.SetItems(filteredItems)
@@ -55,12 +56,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "i":
 			if m.stacksFilter != stacksFilterInSync {
 				filteredItems := make([]list.Item, 0)
-				for _, item := range m.stacksListReserve {
-					stackItem, ok := item.(Stack)
-					if ok {
-						if stackItem.FetchStatus == StatusFetched && !stackItem.OuttaSync {
-							filteredItems = append(filteredItems, item)
-						}
+				for _, st := range m.stacksListReserve {
+					if st.FetchStatus == StatusFetched && !st.OuttaSync {
+						filteredItems = append(filteredItems, st)
 					}
 				}
 				m.stacksList.SetItems(filteredItems)
@@ -71,12 +69,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "e":
 			if m.stacksFilter != stacksFilterErr {
 				filteredItems := make([]list.Item, 0)
-				for _, item := range m.stacksListReserve {
-					stackItem, ok := item.(Stack)
-					if ok {
-						if stackItem.Err != nil {
-							filteredItems = append(filteredItems, item)
-						}
+				for _, st := range m.stacksListReserve {
+					if st.Err != nil {
+						filteredItems = append(filteredItems, st)
 					}
 				}
 				m.stacksList.SetItems(filteredItems)
@@ -91,40 +86,33 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case CheckStackStatus:
 		msg.stack.FetchStatus = StatusFetching
 		m.stacksList.SetItem(msg.index, msg.stack)
-		m.stacksListReserve = m.stacksList.Items()
+		m.stacksListReserve[msg.stack.key()] = msg.stack
 		return m, getCFTemplateBody(m.awsConfigs[GetAWSConfigKey(msg.stack)], msg.index, msg.stack)
 	case TemplateFetchedMsg:
 		if msg.err != nil {
 			msg.stack.Err = msg.err
 			msg.stack.FetchStatus = StatusFailure
 			m.stacksList.SetItem(msg.index, msg.stack)
-			m.resultMap[msg.index] = stackResultErr
 		} else {
 			msg.stack.OuttaSync = true
 			msg.stack.FetchStatus = StatusFetched
 			msg.stack.OuttaSync = msg.outtaSync
-			switch msg.outtaSync {
-			case true:
-				m.resultMap[msg.index] = stackResultOuttaSync
-			case false:
-				m.resultMap[msg.index] = stackResultInSync
-			}
 			msg.stack.Template = msg.template
 			msg.stack.Err = nil
 			m.stacksList.SetItem(msg.index, msg.stack)
 		}
 
+		m.stacksListReserve[msg.stack.key()] = msg.stack
 		// recompute outtasync and error numbers
 		m.outtaSyncNum = 0
 		m.errorNum = 0
-		for _, v := range m.resultMap {
-			if v == stackResultOuttaSync {
-				m.outtaSyncNum++
-			} else if v == stackResultErr {
+		for _, st := range m.stacksListReserve {
+			if st.Err != nil {
 				m.errorNum++
+			} else if st.OuttaSync {
+				m.outtaSyncNum++
 			}
 		}
-		m.stacksListReserve = m.stacksList.Items()
 	case ShowFileFinished:
 		if msg.err != nil {
 			m.errorMessage = fmt.Sprintf("Error showing file: %s", Trim(msg.err.Error(), 50))

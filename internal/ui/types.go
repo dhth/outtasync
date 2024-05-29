@@ -37,9 +37,14 @@ type Stack struct {
 	Err            error
 }
 
+func (stack Stack) key() string {
+	return fmt.Sprintf("%s:%s:%s", stack.AwsProfile, stack.AwsRegion, stack.Name)
+}
+
 func (stack Stack) Title() string {
 	return fmt.Sprintf("%s", RightPadTrim(stack.Name, int(float64(listWidth)*0.8)))
 }
+
 func (stack Stack) Description() string {
 	var status string
 	switch stack.FetchStatus {
@@ -62,6 +67,7 @@ func (stack Stack) Description() string {
 	}
 	return fmt.Sprintf("@%s %s", RightPadTrim(desc, int(float64(listWidth)*0.6)), status)
 }
+
 func (stack Stack) FilterValue() string { return stack.Name }
 
 type delegateKeyMap struct {

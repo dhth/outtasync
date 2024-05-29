@@ -39,7 +39,7 @@ type model struct {
 	awsConfigs        map[string]AwsConfig
 	state             stateView
 	stacksList        list.Model
-	stacksListReserve []list.Item
+	stacksListReserve map[string]Stack
 	stacksFilter      stackFilter
 	resultMap         map[int]stackResult
 	checkOnStart      bool
