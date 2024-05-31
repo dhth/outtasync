@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"hash/fnv"
+
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -66,4 +68,28 @@ var (
 			Bold(true).
 			PaddingLeft(2).
 			Foreground(lipgloss.Color(helpMsgColor))
+
+	tagColors = []string{
+		"#d3869b",
+		"#8ec07c",
+		"#fabd2f",
+		"#83a598",
+		"#48cae4",
+		"#ff99ac",
+		"#ff5c8a",
+		"#e0aaff",
+	}
+	tagStyle = func(tag string) lipgloss.Style {
+		h := fnv.New32()
+		h.Write([]byte(tag))
+		hash := h.Sum32()
+
+		color := tagColors[int(hash)%len(tagColors)]
+
+		st := lipgloss.NewStyle().
+			PaddingRight(1).
+			Foreground(lipgloss.Color(color))
+
+		return st
+	}
 )

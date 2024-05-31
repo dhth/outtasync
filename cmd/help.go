@@ -14,19 +14,28 @@ profiles:
   - name: papaya-service-qa
     local: ~/projects/papaya-service/cloudformation/service.yml
     region: eu-central-1
+    tags:
+    - qa
+    - auth
   - name: racoon-service-qa
     local: ~/projects/racoon-service/cloudformation/service.yml
     region: eu-central-1
+    tags:
+    - qa
+    - payments
 - name: prod
   stacks:
   - name: brb-dll-prod
-    local: ~/projects/brd-dll-service/cloudformation/service.yml
+    local: ~/projects/brb-dll-service/cloudformation/service.yml
     region: eu-central-1
     refreshCommand: aws sso login --profile rgb-prod
+    tags:
+    - prod
+    - integrations
   - name: galactus-service-prod
     local: ~/projects/galactus-service/cloudformation/service.yml
     region: eu-central-1`
-	helpText = `Identify cloudformation stacks that have gone out of sync with the state represented by their stack files
+	helpText = `Identify cloudformation stacks that have gone out of sync with the state represented by their stack files.
 
 Usage: outtasync [flags]`
 )

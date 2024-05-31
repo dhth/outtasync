@@ -21,6 +21,8 @@ func die(msg string, args ...any) {
 var (
 	mode         = flag.String("mode", "tui", "the mode to use; possible values: tui/cli")
 	pattern      = flag.String("p", "", "regex pattern to filter stack names")
+	profiles     = flag.String("profiles", "", "comma separated string of profiles to filter for")
+	tags         = flag.String("t", "", "comma separated string of tags to filter for; will match stacks that contain all tags specified here")
 	checkOnStart = flag.Bool("c", false, "whether to check status for all stacks on startup")
 )
 
@@ -31,7 +33,6 @@ func Execute() {
 		defaultConfigFilePath = fmt.Sprintf("%s/.config/outtasync.yml", currentUser.HomeDir)
 	}
 	configFilePath := flag.String("config-file", defaultConfigFilePath, "path of the config file")
-	profiles := flag.String("profiles", "", "comma separated string of profiles to filter for")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "%s\n\nFlags:\n", helpText)
@@ -67,7 +68,12 @@ func Execute() {
 		profilesToFetch = strings.Split(*profiles, ",")
 	}
 
-	stacks, err := ReadConfig(*configFilePath, profilesToFetch, regexPattern)
+	var tagsToFetch []string
+	if *tags != "" {
+		tagsToFetch = strings.Split(*tags, ",")
+	}
+
+	stacks, err := readConfig(*configFilePath, profilesToFetch, tagsToFetch, regexPattern)
 	if err != nil {
 		die(cfgErrSuggestion(fmt.Sprintf("Error reading config: %v", *configFilePath)))
 	}

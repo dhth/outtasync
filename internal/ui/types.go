@@ -24,13 +24,17 @@ const (
 	stackResultOuttaSync
 )
 
+const (
+	tagWidth = 20
+)
+
 type Stack struct {
 	Name           string
 	AwsProfile     string
 	AwsRegion      string
 	Template       string
 	Local          string
-	Tag            *string
+	Tags           []string
 	RefreshCommand string
 	FetchStatus    fetchStatus
 	OuttaSync      bool
@@ -60,12 +64,35 @@ func (stack Stack) Description() string {
 	case StatusFailure:
 		status = errorStyle.Render("error")
 	}
-	var desc = stack.AwsProfile
+	var desc string
+
+	var descBudget = int(float64(listWidth) * 0.5)
 
 	if stack.Err != nil {
-		desc = stack.Err.Error()
+		desc = RightPadTrim(stack.Err.Error(), int(float64(listWidth)*0.5))
+	} else {
+		if stack.Tags != nil {
+			var tagsLength int
+			for _, tag := range stack.Tags {
+				nextTag := RightPadTrim(fmt.Sprintf("#%s ", tag), tagWidth)
+				if tagsLength+tagWidth > descBudget {
+					break
+				}
+				desc += tagStyle(tag).Render(nextTag)
+				tagsLength += tagWidth + 1 // +1 is due to PaddingRight in the style
+			}
+			for i := 0; i < descBudget-tagsLength; i++ {
+				desc += " "
+			}
+		} else {
+			desc = RightPadTrim("@"+stack.AwsProfile, int(float64(listWidth)*0.5))
+		}
 	}
-	return fmt.Sprintf("@%s %s", RightPadTrim(desc, int(float64(listWidth)*0.6)), status)
+
+	return fmt.Sprintf("%s %s",
+		desc,
+		status,
+	)
 }
 
 func (stack Stack) FilterValue() string { return stack.Name }

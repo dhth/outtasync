@@ -51,15 +51,24 @@ profiles:
   - name: papaya-service-qa
     local: ~/projects/papaya-service/cloudformation/service.yml
     region: eu-central-1
+    tags:
+    - qa
+    - auth
   - name: racoon-service-qa
     local: ~/projects/racoon-service/cloudformation/service.yml
     region: eu-central-1
+    tags:
+    - qa
+    - payments
 - name: prod
   stacks:
   - name: brb-dll-prod
     local: ~/projects/brb-dll-service/cloudformation/service.yml
     region: eu-central-1
     refreshCommand: aws sso login --profile rgb-prod
+    tags:
+    - prod
+    - integrations
   - name: galactus-service-prod
     local: ~/projects/galactus-service/cloudformation/service.yml
     region: eu-central-1
@@ -83,6 +92,7 @@ CLI mode (ideal for running in a CI pipeline). TUI mode is the default.
 outtasync
 outtasync -config-file /path/to/config.yml
 outtasync -profiles qa,prod
+outtasync -t 'comma,separated,list,of,tags,to,filter,for'
 outtasync -p '<regex-pattern-for-stack-names>'
 outtasync -p '.*(qa|staging)$'
 outtasync -c # to check status for all stacks on startup

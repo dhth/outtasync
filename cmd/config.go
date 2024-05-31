@@ -14,11 +14,11 @@ type T struct {
 	Profiles []struct {
 		Name   string `yaml:"name"`
 		Stacks []struct {
-			Name           string  `yaml:"name"`
-			Region         string  `yaml:"region"`
-			Local          string  `yaml:"local"`
-			Tag            *string `yaml:"tag,omitempty"`
-			RefreshCommand *string `yaml:"refreshCommand,omitempty"`
+			Name           string   `yaml:"name"`
+			Region         string   `yaml:"region"`
+			Local          string   `yaml:"local"`
+			Tags           []string `yaml:"tags,omitempty"`
+			RefreshCommand *string  `yaml:"refreshCommand,omitempty"`
 		} `yaml:"stacks"`
 	} `yaml:"profiles"`
 	GlobalRefreshCommand string `yaml:"globalRefreshCommand"`
@@ -35,7 +35,11 @@ func expandTilde(path string) string {
 	return path
 }
 
-func ReadConfig(configFilePath string, profilesToFetch []string, pattern *regexp.Regexp) ([]ui.Stack, error) {
+func readConfig(configFilePath string,
+	profilesToFetch []string,
+	tagsToFetch []string,
+	pattern *regexp.Regexp) ([]ui.Stack, error) {
+
 	localFile, err := os.ReadFile(expandTilde(configFilePath))
 	if err != nil {
 		os.Exit(1)
@@ -46,19 +50,46 @@ func ReadConfig(configFilePath string, profilesToFetch []string, pattern *regexp
 		return nil, err
 	}
 	profilesMap := make(map[string]bool)
-	for _, p := range profilesToFetch {
-		profilesMap[p] = true
+	if profilesToFetch != nil {
+		for _, p := range profilesToFetch {
+			profilesMap[p] = true
+		}
 	}
 
 	globalRefreshCmd := t.GlobalRefreshCommand
 	var rows []ui.Stack
 	for _, profile := range t.Profiles {
+
 		if len(profilesToFetch) > 0 && !profilesMap[profile.Name] {
 			continue
 		}
+
 		for _, stack := range profile.Stacks {
 			if pattern != nil && !pattern.MatchString(stack.Name) {
 				continue
+			}
+
+			if len(tagsToFetch) > 0 {
+				if stack.Tags == nil {
+					continue
+				}
+
+				stackTagsMap := make(map[string]bool)
+				for _, tag := range stack.Tags {
+					stackTagsMap[tag] = true
+				}
+
+				tagNotInStack := false
+				for _, tagToFetch := range tagsToFetch {
+					if !stackTagsMap[tagToFetch] {
+						tagNotInStack = true
+						break
+					}
+				}
+				if tagNotInStack {
+					continue
+				}
+
 			}
 			var refreshCmd string
 			if stack.RefreshCommand != nil {
@@ -72,7 +103,7 @@ func ReadConfig(configFilePath string, profilesToFetch []string, pattern *regexp
 				AwsRegion:      stack.Region,
 				Template:       "",
 				Local:          expandTilde(stack.Local),
-				Tag:            stack.Tag,
+				Tags:           stack.Tags,
 				RefreshCommand: refreshCmd,
 				FetchStatus:    ui.StatusUnfetched,
 				OuttaSync:      false,
