@@ -1,7 +1,7 @@
 package ui
 
-type DiffFinishedMsg struct{ err error }
-type ShowErrorFinishedMsg struct{ err error }
+type DiffFinishedMsg struct{}
+type ShowErrorFinishedMsg struct{}
 type CredentialsRefreshedMsg struct{ err error }
 type ShowDiffFinished struct{ err error }
 type ShowFileFinished struct{ err error }

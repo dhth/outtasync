@@ -27,9 +27,10 @@ func InitialModel(stacks []Stack, awsCfgs map[string]AwsConfig, checkOnStart boo
 	m.stacksList.Title = "Stacks"
 	m.stacksList.SetStatusBarItemName("stack", "stacks")
 	m.stacksList.DisableQuitKeybindings()
-	m.stacksList.Styles.Title.Background(lipgloss.Color(stackListColor))
-	m.stacksList.Styles.Title.Foreground(lipgloss.Color(defaultBackgroundColor))
-	m.stacksList.Styles.Title.Bold(true)
+	m.stacksList.Styles.Title = m.stacksList.Styles.Title.
+		Background(lipgloss.Color(stackListColor)).
+		Foreground(lipgloss.Color(defaultBackgroundColor)).
+		Bold(true)
 
 	return m
 }

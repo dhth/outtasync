@@ -35,7 +35,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.stacksList.SetItems(allItems)
 				m.stacksList.Title = "stacks"
 				m.stacksFilter = stacksFilterAll
-				m.stacksList.Styles.Title.Background(lipgloss.Color(stackListColor))
+				m.stacksList.Styles.Title = m.stacksList.Styles.Title.Background(lipgloss.Color(stackListColor))
 			} else {
 				return m, tea.Quit
 			}
@@ -50,7 +50,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.stacksList.SetItems(filteredItems)
 				m.stacksList.Title = "stacks (outtasync)"
 				m.stacksFilter = stacksFilterOuttaSync
-				m.stacksList.Styles.Title.Background(lipgloss.Color(outtaSyncColor))
+				m.stacksList.Styles.Title = m.stacksList.Styles.Title.Background(lipgloss.Color(outtaSyncColor))
 
 			}
 		case "i":
@@ -64,7 +64,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.stacksList.SetItems(filteredItems)
 				m.stacksList.Title = "stacks (in sync)"
 				m.stacksFilter = stacksFilterInSync
-				m.stacksList.Styles.Title.Background(lipgloss.Color(inSyncColor))
+				m.stacksList.Styles.Title = m.stacksList.Styles.Title.Background(lipgloss.Color(inSyncColor))
 			}
 		case "e":
 			if m.stacksFilter != stacksFilterErr {
@@ -77,7 +77,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.stacksList.SetItems(filteredItems)
 				m.stacksList.Title = "stacks (with errors)"
 				m.stacksFilter = stacksFilterErr
-				m.stacksList.Styles.Title.Background(lipgloss.Color(errorColor))
+				m.stacksList.Styles.Title = m.stacksList.Styles.Title.Background(lipgloss.Color(errorColor))
 			}
 		}
 	case tea.WindowSizeMsg:

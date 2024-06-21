@@ -50,10 +50,8 @@ func readConfig(configFilePath string,
 		return nil, err
 	}
 	profilesMap := make(map[string]bool)
-	if profilesToFetch != nil {
-		for _, p := range profilesToFetch {
-			profilesMap[p] = true
-		}
+	for _, p := range profilesToFetch {
+		profilesMap[p] = true
 	}
 
 	globalRefreshCmd := t.GlobalRefreshCommand

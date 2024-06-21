@@ -30,41 +30,41 @@ var (
 			PaddingBottom(1).
 			Width(listWidth + 10)
 
-	stackListStyle = baseListStyle.Copy()
+	stackListStyle = baseListStyle
 
-	modeStyle = baseStyle.Copy().
+	modeStyle = baseStyle.
 			Align(lipgloss.Center).
 			Bold(true).
 			Background(lipgloss.Color(modeColor))
 
-	driftStatusStyle = baseStyle.Copy().
+	driftStatusStyle = baseStyle.
 				Bold(true).
 				Align(lipgloss.Center).
 				Width(12)
 
-	fetchingStyle = driftStatusStyle.Copy().
+	fetchingStyle = driftStatusStyle.
 			Background(lipgloss.Color(fetchingColor))
 
-	insSyncStyle = driftStatusStyle.Copy().
+	insSyncStyle = driftStatusStyle.
 			Background(lipgloss.Color(inSyncColor))
 
-	outtaSyncStyle = driftStatusStyle.Copy().
+	outtaSyncStyle = driftStatusStyle.
 			Background(lipgloss.Color(outtaSyncColor))
 
-	errorStyle = driftStatusStyle.Copy().
+	errorStyle = driftStatusStyle.
 			Background(lipgloss.Color(errorColor))
 
 	msgStyle = lipgloss.NewStyle().
 			PaddingLeft(2).
 			Bold(true)
 
-	outtaSyncMsgStyle = msgStyle.Copy().
+	outtaSyncMsgStyle = msgStyle.
 				Foreground(lipgloss.Color(outtaSyncColor))
 
-	errorMsgStyle = msgStyle.Copy().
+	errorMsgStyle = msgStyle.
 			Foreground(lipgloss.Color(errorColor))
 
-	helpMsgStyle = baseStyle.Copy().
+	helpMsgStyle = baseStyle.
 			Bold(true).
 			PaddingLeft(2).
 			Foreground(lipgloss.Color(helpMsgColor))

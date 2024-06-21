@@ -56,9 +56,9 @@ func newAppItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 		SelectedTitle.
 		Foreground(lipgloss.Color(stackListColor)).
 		BorderLeftForeground(lipgloss.Color(stackListColor))
+
 	d.Styles.SelectedDesc = d.Styles.
-		SelectedTitle.
-		Copy()
+		SelectedTitle
 
 	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
 		fs := m.FilterState()

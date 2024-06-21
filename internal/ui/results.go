@@ -42,7 +42,7 @@ func ShowResults(stacks []Stack, awsCfgs map[string]AwsConfig) {
 		if outtaSyncCount == 1 {
 			fmt.Printf("1 stack is outtasync:\n\n")
 		} else {
-			fmt.Printf(fmt.Sprintf("%d stacks are outtasync:\n\n", outtaSyncCount))
+			fmt.Printf("%d stacks are outtasync:\n\n", outtaSyncCount)
 		}
 		fmt.Print(outtaSyncStacks)
 	}
@@ -52,7 +52,7 @@ func ShowResults(stacks []Stack, awsCfgs map[string]AwsConfig) {
 		if errorsCount == 1 {
 			fmt.Printf("1 error:\n\n")
 		} else {
-			fmt.Printf(fmt.Sprintf("%d errors:\n\n", errorsCount))
+			fmt.Printf("%d errors:\n\n", errorsCount)
 		}
 		fmt.Print(errorResults)
 	}

@@ -15,15 +15,6 @@ const (
 	StatusFailure
 )
 
-type stackResult uint
-
-const (
-	stackResultErr stackResult = iota
-	stackResultUnchecked
-	stackResultInSync
-	stackResultOuttaSync
-)
-
 const (
 	tagWidth = 20
 )
@@ -46,7 +37,7 @@ func (stack Stack) key() string {
 }
 
 func (stack Stack) Title() string {
-	return fmt.Sprintf("%s", RightPadTrim(stack.Name, int(float64(listWidth)*0.8)))
+	return RightPadTrim(stack.Name, int(float64(listWidth)*0.8))
 }
 
 func (stack Stack) Description() string {

@@ -41,13 +41,9 @@ type model struct {
 	stacksList        list.Model
 	stacksListReserve map[string]Stack
 	stacksFilter      stackFilter
-	resultMap         map[int]stackResult
 	checkOnStart      bool
 	message           string
 	errorMessage      string
-	terminalHeight    int
-	terminalWidth     int
-	err               error
 	outtaSyncNum      uint
 	errorNum          uint
 	showHelp          bool
