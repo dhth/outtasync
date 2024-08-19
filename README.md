@@ -26,6 +26,9 @@ brew install dhth/tap/outtasync
 go install github.com/dhth/outtasync@latest
 ```
 
+Or get the binaries directly from a [release][2]. Read more about verifying the
+authenticity of released artifacts [here](#-verifying-release-artifacts).
+
 🛠️ Pre-requisites
 ---
 
@@ -154,6 +157,48 @@ q                                    return to previous page/quit
 
 ![Usage-3](https://tools.dhruvs.space/images/outtasync/outtasync-3.png)
 
+🔐 Verifying release artifacts
+---
+
+In case you get the `outtasync` binary directly from a [release][2], you may
+want to verify its authenticity. Checksums are applied to all released
+artifacts, and the resulting checksum file is signed using
+[cosign](https://docs.sigstore.dev/cosign/installation/).
+
+Steps to verify (replace `x.y.z` in the commands listed below with the version
+you want):
+
+1. Download the following files from the release:
+
+   - outtasync_x.y.z_checksums.txt
+   - outtasync_x.y.z_checksums.txt.pem
+   - outtasync_x.y.z_checksums.txt.sig
+
+2. Verify the signature:
+
+   ```shell
+   cosign verify-blob outtasync_x.y.z_checksums.txt \
+       --certificate outtasync_x.y.z_checksums.txt.pem \
+       --signature outtasync_x.y.z_checksums.txt.sig \
+       --certificate-identity-regexp 'https://github\.com/dhth/outtasync/\.github/workflows/.+' \
+       --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+   ```
+
+3. Download the compressed archive you want, and validate its checksum:
+
+   ```shell
+   curl -sSLO https://github.com/dhth/outtasync/releases/download/vx.y.z/outtasync_x.y.z_linux_amd64.tar.gz
+   sha256sum --ignore-missing -c outtasync_x.y.z_checksums.txt
+   ```
+
+3. If checksum validation goes through, uncompress the archive:
+
+   ```shell
+   tar -xzf outtasync_x.y.z_linux_amd64.tar.gz
+   ./outtasync
+   # profit!
+   ```
+
 TODO
 ---
 
@@ -166,3 +211,4 @@ Acknowledgements
 `outtasync` is built using the awesome TUI framework [bubbletea][1].
 
 [1]: https://github.com/charmbracelet/bubbletea
+[2]: https://github.com/dhth/outtasync/releases
