@@ -3,23 +3,28 @@ package ui
 import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/dhth/outtasync/internal/aws"
+	"github.com/dhth/outtasync/internal/types"
 )
 
-func InitialModel(stacks []Stack, awsCfgs map[string]AwsConfig, checkOnStart bool) model {
+func InitialModel(stacks []types.Stack, awsCfgs map[string]aws.Config, checkOnStart bool) Model {
 	stackItems := make([]list.Item, len(stacks))
 
-	stackReserve := make(map[string]Stack)
+	stackReserve := make(map[string]stackItem)
 	for i, stack := range stacks {
-		stackItems[i] = stack
-		stackReserve[stack.key()] = stack
+		si := stackItem{
+			stack: stack,
+		}
+		stackItems[i] = si
+		stackReserve[stack.Key()] = si
 	}
 
-	var appDelegateKeys = newAppDelegateKeyMap()
+	appDelegateKeys := newAppDelegateKeyMap()
 	appDelegate := newAppItemDelegate(appDelegateKeys)
 
-	m := model{
+	m := Model{
 		awsConfigs:   awsCfgs,
-		stacksList:   list.New(stackItems, appDelegate, listWidth, 0),
+		stacksList:   list.New(stackItems, appDelegate, defaultListWidth, 0),
 		checkOnStart: checkOnStart,
 		showHelp:     true,
 	}

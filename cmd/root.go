@@ -1,22 +1,25 @@
 package cmd
 
 import (
+	"errors"
+	"flag"
 	"fmt"
 	"os"
-	"os/user"
+	"path/filepath"
 	"regexp"
 	"strings"
 
-	"flag"
-
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	"github.com/dhth/outtasync/internal/aws"
 	"github.com/dhth/outtasync/internal/ui"
 )
 
-func die(msg string, args ...any) {
-	fmt.Fprintf(os.Stderr, msg+"\n", args...)
-	os.Exit(1)
-}
+const (
+	configFileName = "outtasync/outtasync.yml"
+	helpText       = `Identify cloudformation stacks that have gone out of sync with the state represented by their stack files.
+
+Usage: outtasync [flags]`
+)
 
 var (
 	mode         = flag.String("mode", "tui", "the mode to use; possible values: tui/cli")
@@ -26,12 +29,30 @@ var (
 	checkOnStart = flag.Bool("c", false, "whether to check status for all stacks on startup")
 )
 
-func Execute() {
-	currentUser, err := user.Current()
-	var defaultConfigFilePath string
-	if err == nil {
-		defaultConfigFilePath = fmt.Sprintf("%s/.config/outtasync.yml", currentUser.HomeDir)
+var (
+	errModeFlagEmpty          = errors.New("mode flag cannot be empty")
+	errConfigFileFlagEmpty    = errors.New("config file flag cannot be empty")
+	errCouldntGetHomeDir      = errors.New("couldn't get your home directory")
+	errCouldntGetConfigDir    = errors.New("couldn't get your default config directory")
+	errConfigFileExtIncorrect = errors.New("config file must be a YAML file")
+	errConfigFileDoesntExist  = errors.New("config file does not exist")
+	errCouldntReadConfigFile  = errors.New("couldn't read config file")
+	errCouldntParseConfigFile = errors.New("couldn't parse config file")
+	errIncorrectRegexProvided = errors.New("incorrect regex provided")
+	errNoStacksFound          = errors.New("no stacks found")
+)
+
+func Execute() error {
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("%w: %s", errCouldntGetHomeDir, err.Error())
 	}
+
+	defaultConfigDir, err := os.UserConfigDir()
+	if err != nil {
+		return fmt.Errorf("%w: %s", errCouldntGetConfigDir, err.Error())
+	}
+	defaultConfigFilePath := filepath.Join(defaultConfigDir, configFileName)
 	configFilePath := flag.String("config-file", defaultConfigFilePath, "path of the config file")
 
 	flag.Usage = func() {
@@ -42,25 +63,31 @@ func Execute() {
 	flag.Parse()
 
 	if *mode == "" {
-		die("mode cannot be empty")
+		return fmt.Errorf("%w", errModeFlagEmpty)
 	}
 
 	if *configFilePath == "" {
-		die("config-file cannot be empty")
+		return fmt.Errorf("%w", errConfigFileFlagEmpty)
 	}
+
+	configPathFull := expandTilde(*configFilePath, userHomeDir)
 
 	var regexPattern *regexp.Regexp
 
 	if *pattern != "" {
 		regexPattern, err = regexp.Compile(*pattern)
 		if err != nil {
-			die("Incorrect regex pattern provided: %q\n", err)
+			return fmt.Errorf("%w: %s", errIncorrectRegexProvided, err.Error())
 		}
 	}
 
-	_, err = os.Stat(*configFilePath)
+	if filepath.Ext(configPathFull) != ".yml" && filepath.Ext(configPathFull) != ".yaml" {
+		return errConfigFileExtIncorrect
+	}
+
+	_, err = os.Stat(configPathFull)
 	if os.IsNotExist(err) {
-		die(cfgErrSuggestion(fmt.Sprintf("Error: file doesn't exist at %q", *configFilePath)))
+		return fmt.Errorf("%w: %s", errConfigFileDoesntExist, err.Error())
 	}
 
 	var profilesToFetch []string
@@ -73,37 +100,47 @@ func Execute() {
 		tagsToFetch = strings.Split(*tags, ",")
 	}
 
-	stacks, err := readConfig(*configFilePath, profilesToFetch, tagsToFetch, regexPattern)
+	configBytes, err := os.ReadFile(configPathFull)
 	if err != nil {
-		die(cfgErrSuggestion(fmt.Sprintf("Error reading config: %v", *configFilePath)))
-	}
-	if len(stacks) == 0 {
-		die("No stacks found for the requested parameters")
+		return fmt.Errorf("%w: %s", errCouldntReadConfigFile, err.Error())
 	}
 
-	awsCfgs := make(map[string]ui.AwsConfig)
-	cfClients := make(map[string]ui.AwsCFClient)
+	stacks, err := readConfig(userHomeDir, configBytes, profilesToFetch, tagsToFetch, regexPattern)
+	if err != nil {
+		return fmt.Errorf("%w: %s", errCouldntParseConfigFile, err.Error())
+	}
+
+	if len(stacks) == 0 {
+		return fmt.Errorf("%w", errNoStacksFound)
+	}
+
+	awsCfgs := make(map[string]aws.Config)
+	cfClients := make(map[string]aws.CFClient)
 
 	seen := make(map[string]bool)
 	for _, stack := range stacks {
-		configKey := ui.GetAWSConfigKey(stack)
+		configKey := stack.AWSConfigKey()
 		if !seen[configKey] {
-			cfg, err := ui.GetAWSConfig(stack.AwsProfile, stack.AwsRegion)
-			awsCfgs[configKey] = ui.AwsConfig{Config: cfg, Err: err}
+			cfg, err := aws.GetAWSConfig(stack.AwsProfile, stack.AwsRegion)
+			awsCfgs[configKey] = aws.Config{Config: cfg, Err: err}
 			seen[configKey] = true
 			if err != nil {
-				cfClients[configKey] = ui.AwsCFClient{Err: err}
+				cfClients[configKey] = aws.CFClient{Err: err}
 			} else {
-				cfClients[configKey] = ui.AwsCFClient{Client: cloudformation.NewFromConfig(cfg)}
+				cfClients[configKey] = aws.CFClient{Client: cloudformation.NewFromConfig(cfg)}
 			}
 		}
 	}
 
 	switch *mode {
 	case "tui":
-		ui.RenderUI(stacks, awsCfgs, *checkOnStart)
+		err = ui.RenderUI(stacks, awsCfgs, *checkOnStart)
+		if err != nil {
+			return err
+		}
 	case "cli":
-		ui.ShowResults(stacks, awsCfgs)
+		showResults(stacks, awsCfgs)
 	}
 
+	return nil
 }

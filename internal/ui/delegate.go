@@ -7,6 +7,17 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type delegateKeyMap struct {
+	choose             key.Binding
+	chooseAll          key.Binding
+	refreshCredentials key.Binding
+	showDiff           key.Binding
+	filterOuttaSync    key.Binding
+	filterInSync       key.Binding
+	filterErrors       key.Binding
+	close              key.Binding
+}
+
 func newAppDelegateKeyMap() *delegateKeyMap {
 	return &delegateKeyMap{
 		choose: key.NewBinding(
@@ -45,8 +56,8 @@ func newAppDelegateKeyMap() *delegateKeyMap {
 }
 
 type CheckStackStatus struct {
-	index int
-	stack Stack
+	index     int
+	stackItem stackItem
 }
 
 func newAppItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
@@ -73,12 +84,12 @@ func newAppItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 		case list.Filtering:
 			return nil
 		}
-		var stack Stack
+		var si stackItem
 
 		var cmds []tea.Cmd
 		index := m.Index()
-		if i, ok := m.SelectedItem().(Stack); ok {
-			stack = i
+		if i, ok := m.SelectedItem().(stackItem); ok {
+			si = i
 		} else {
 			return nil
 		}
@@ -87,28 +98,27 @@ func newAppItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 		case tea.KeyMsg:
 			switch {
 			case key.Matches(msgType, keys.choose):
-				return StackChosen(index, stack)
+				return StackChosen(index, si)
 			case key.Matches(msgType, keys.chooseAll):
 				for i, stack := range m.Items() {
-					if st, ok := stack.(Stack); ok {
+					if st, ok := stack.(stackItem); ok {
 						cmds = append(cmds, StackChosen(i, st))
 					}
 				}
 				return tea.Batch(cmds...)
 			case key.Matches(msgType, keys.refreshCredentials):
-				return refreshCredentials(stack.RefreshCommand)
+				return refreshCredentials(si.stack.RefreshCommand)
 			case key.Matches(msgType, keys.showDiff):
-				switch stack.FetchStatus {
-				case StatusFetched:
-					switch stack.OuttaSync {
+				switch si.fetchStatus {
+				case statusFetched:
+					switch si.outtaSync {
 					case true:
-						return showDiff(stack)
+						return showDiff(si)
 					case false:
-						return showFile(stack.Local)
+						return showFile(si.stack.Local)
 					}
 				}
 			}
-
 		}
 		return nil
 	}

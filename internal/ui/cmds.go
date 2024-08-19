@@ -7,11 +7,12 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/dhth/outtasync/internal/aws"
 )
 
-func StackChosen(index int, stack Stack) tea.Cmd {
+func StackChosen(index int, si stackItem) tea.Cmd {
 	return func() tea.Msg {
-		return CheckStackStatus{index, stack}
+		return CheckStackStatus{index, si}
 	}
 }
 
@@ -26,11 +27,11 @@ func refreshCredentials(cmd string) tea.Cmd {
 	})
 }
 
-func showDiff(stack Stack) tea.Cmd {
+func showDiff(si stackItem) tea.Cmd {
 	c := exec.Command("bash", "-c",
 		fmt.Sprintf("cat << 'EOF' | git diff --dst-prefix='Actual Cloudformation stack' --no-index -- %s -\n%s\nEOF",
-			stack.Local,
-			stack.Template,
+			si.stack.Local,
+			si.stack.Template,
 		))
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		if err != nil {
@@ -53,14 +54,14 @@ func showFile(filePath string) tea.Cmd {
 	})
 }
 
-func getCFTemplateBody(awsConfig AwsConfig, index int, stack Stack) tea.Cmd {
+func getCFTemplateBody(awsConfig aws.Config, index int, stackItem stackItem) tea.Cmd {
 	return func() tea.Msg {
-		stackSyncStatus := CheckStackSyncStatus(awsConfig, stack)
+		stackSyncStatus := aws.CheckStackSyncStatus(awsConfig, stackItem.stack)
 
 		if awsConfig.Err != nil {
-			return TemplateFetchedMsg{index, stack, "", false, awsConfig.Err}
+			return TemplateFetchedMsg{index, stackItem, "", false, awsConfig.Err}
 		}
-		return TemplateFetchedMsg{index, stack, stackSyncStatus.TemplateBody, stackSyncStatus.Outtasync, stackSyncStatus.Err}
+		return TemplateFetchedMsg{index, stackItem, stackSyncStatus.TemplateBody, stackSyncStatus.Outtasync, stackSyncStatus.Err}
 	}
 }
 

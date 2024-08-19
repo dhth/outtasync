@@ -1,16 +1,15 @@
 package cmd
 
 import (
-	"os"
-	"os/user"
+	"path/filepath"
 	"regexp"
 	"strings"
 
-	"github.com/dhth/outtasync/internal/ui"
+	"github.com/dhth/outtasync/internal/types"
 	"gopkg.in/yaml.v3"
 )
 
-type T struct {
+type Config struct {
 	Profiles []struct {
 		Name   string `yaml:"name"`
 		Stacks []struct {
@@ -24,39 +23,30 @@ type T struct {
 	GlobalRefreshCommand string `yaml:"globalRefreshCommand"`
 }
 
-func expandTilde(path string) string {
-	if strings.HasPrefix(path, "~") {
-		usr, err := user.Current()
-		if err != nil {
-			os.Exit(1)
-		}
-		return strings.Replace(path, "~", usr.HomeDir, 1)
+func expandTilde(path string, homeDir string) string {
+	if strings.HasPrefix(path, "~/") {
+		return filepath.Join(homeDir, path[2:])
 	}
 	return path
 }
 
-func readConfig(configFilePath string,
-	profilesToFetch []string,
-	tagsToFetch []string,
-	pattern *regexp.Regexp) ([]ui.Stack, error) {
+func readConfig(homeDir string, configBytes []byte, profilesToFetch []string, tagsToFetch []string, pattern *regexp.Regexp,
+) ([]types.Stack, error) {
+	var stacks []types.Stack
+	cfg := Config{}
 
-	localFile, err := os.ReadFile(expandTilde(configFilePath))
+	err := yaml.Unmarshal(configBytes, &cfg)
 	if err != nil {
-		os.Exit(1)
+		return stacks, err
 	}
-	t := T{}
-	err = yaml.Unmarshal(localFile, &t)
-	if err != nil {
-		return nil, err
-	}
+
 	profilesMap := make(map[string]bool)
 	for _, p := range profilesToFetch {
 		profilesMap[p] = true
 	}
 
-	globalRefreshCmd := t.GlobalRefreshCommand
-	var rows []ui.Stack
-	for _, profile := range t.Profiles {
+	globalRefreshCmd := cfg.GlobalRefreshCommand
+	for _, profile := range cfg.Profiles {
 
 		if len(profilesToFetch) > 0 && !profilesMap[profile.Name] {
 			continue
@@ -95,20 +85,16 @@ func readConfig(configFilePath string,
 			} else {
 				refreshCmd = globalRefreshCmd
 			}
-			rows = append(rows, ui.Stack{
+
+			stacks = append(stacks, types.Stack{
 				Name:           stack.Name,
 				AwsProfile:     profile.Name,
 				AwsRegion:      stack.Region,
-				Template:       "",
-				Local:          expandTilde(stack.Local),
+				Local:          expandTilde(stack.Local, homeDir),
 				Tags:           stack.Tags,
 				RefreshCommand: refreshCmd,
-				FetchStatus:    ui.StatusUnfetched,
-				OuttaSync:      false,
-				Err:            nil,
 			})
 		}
 	}
-	return rows, nil
-
+	return stacks, nil
 }

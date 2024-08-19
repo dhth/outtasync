@@ -27,8 +27,7 @@ var (
 			PaddingTop(1).
 			PaddingRight(2).
 			PaddingLeft(1).
-			PaddingBottom(1).
-			Width(listWidth + 10)
+			PaddingBottom(1)
 
 	stackListStyle = baseListStyle
 

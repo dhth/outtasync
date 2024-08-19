@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 
@@ -43,7 +43,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.stacksFilter != stacksFilterOuttaSync {
 				filteredItems := make([]list.Item, 0)
 				for _, st := range m.stacksListReserve {
-					if st.FetchStatus == StatusFetched && st.OuttaSync {
+					if st.fetchStatus == statusFetched && st.outtaSync {
 						filteredItems = append(filteredItems, st)
 					}
 				}
@@ -57,7 +57,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.stacksFilter != stacksFilterInSync {
 				filteredItems := make([]list.Item, 0)
 				for _, st := range m.stacksListReserve {
-					if st.FetchStatus == StatusFetched && !st.OuttaSync {
+					if st.fetchStatus == statusFetched && !st.outtaSync {
 						filteredItems = append(filteredItems, st)
 					}
 				}
@@ -70,7 +70,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.stacksFilter != stacksFilterErr {
 				filteredItems := make([]list.Item, 0)
 				for _, st := range m.stacksListReserve {
-					if st.Err != nil {
+					if st.err != nil {
 						filteredItems = append(filteredItems, st)
 					}
 				}
@@ -81,35 +81,36 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	case tea.WindowSizeMsg:
-		_, h1 := stackListStyle.GetFrameSize()
-		m.stacksList.SetHeight(msg.Height - h1 - 2)
+		w, h := stackListStyle.GetFrameSize()
+		m.stacksList.SetWidth(msg.Width - w - 2)
+		m.stacksList.SetHeight(msg.Height - h - 2)
 	case CheckStackStatus:
-		msg.stack.FetchStatus = StatusFetching
-		m.stacksList.SetItem(msg.index, msg.stack)
-		m.stacksListReserve[msg.stack.key()] = msg.stack
-		return m, getCFTemplateBody(m.awsConfigs[GetAWSConfigKey(msg.stack)], msg.index, msg.stack)
+		msg.stackItem.fetchStatus = statusFetching
+		m.stacksList.SetItem(msg.index, msg.stackItem)
+		m.stacksListReserve[msg.stackItem.stack.Key()] = msg.stackItem
+		return m, getCFTemplateBody(m.awsConfigs[msg.stackItem.stack.AWSConfigKey()], msg.index, msg.stackItem)
 	case TemplateFetchedMsg:
 		if msg.err != nil {
-			msg.stack.Err = msg.err
-			msg.stack.FetchStatus = StatusFailure
-			m.stacksList.SetItem(msg.index, msg.stack)
+			msg.stackItem.err = msg.err
+			msg.stackItem.fetchStatus = statusFailure
+			m.stacksList.SetItem(msg.index, msg.stackItem)
 		} else {
-			msg.stack.OuttaSync = true
-			msg.stack.FetchStatus = StatusFetched
-			msg.stack.OuttaSync = msg.outtaSync
-			msg.stack.Template = msg.template
-			msg.stack.Err = nil
-			m.stacksList.SetItem(msg.index, msg.stack)
+			msg.stackItem.outtaSync = true
+			msg.stackItem.fetchStatus = statusFetched
+			msg.stackItem.outtaSync = msg.outtaSync
+			msg.stackItem.stack.Template = msg.template
+			msg.stackItem.err = nil
+			m.stacksList.SetItem(msg.index, msg.stackItem)
 		}
 
-		m.stacksListReserve[msg.stack.key()] = msg.stack
+		m.stacksListReserve[msg.stackItem.stack.Key()] = msg.stackItem
 		// recompute outtasync and error numbers
 		m.outtaSyncNum = 0
 		m.errorNum = 0
 		for _, st := range m.stacksListReserve {
-			if st.Err != nil {
+			if st.err != nil {
 				m.errorNum++
-			} else if st.OuttaSync {
+			} else if st.outtaSync {
 				m.outtaSyncNum++
 			}
 		}

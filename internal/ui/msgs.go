@@ -1,14 +1,16 @@
 package ui
 
-type DiffFinishedMsg struct{}
-type ShowErrorFinishedMsg struct{}
-type CredentialsRefreshedMsg struct{ err error }
-type ShowDiffFinished struct{ err error }
-type ShowFileFinished struct{ err error }
+type (
+	DiffFinishedMsg         struct{}
+	ShowErrorFinishedMsg    struct{}
+	CredentialsRefreshedMsg struct{ err error }
+	ShowDiffFinished        struct{ err error }
+	ShowFileFinished        struct{ err error }
+)
 
 type TemplateFetchedMsg struct {
 	index     int
-	stack     Stack
+	stackItem stackItem
 	template  string
 	outtaSync bool
 	err       error

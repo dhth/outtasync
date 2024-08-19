@@ -3,105 +3,68 @@ package ui
 import (
 	"fmt"
 
-	"github.com/charmbracelet/bubbles/key"
+	"github.com/dhth/outtasync/internal/types"
 )
 
 type fetchStatus uint
 
 const (
-	StatusUnfetched fetchStatus = iota
-	StatusFetching
-	StatusFetched
-	StatusFailure
+	statusUnfetched fetchStatus = iota
+	statusFetching
+	statusFetched
+	statusFailure
 )
 
 const (
-	tagWidth = 20
+	tagWidth         = 20
+	stackNamePadding = 80
 )
 
-type Stack struct {
-	Name           string
-	AwsProfile     string
-	AwsRegion      string
-	Template       string
-	Local          string
-	Tags           []string
-	RefreshCommand string
-	FetchStatus    fetchStatus
-	OuttaSync      bool
-	Err            error
+type stackItem struct {
+	stack       types.Stack
+	fetchStatus fetchStatus
+	outtaSync   bool
+	err         error
 }
 
-func (stack Stack) key() string {
-	return fmt.Sprintf("%s:%s:%s", stack.AwsProfile, stack.AwsRegion, stack.Name)
-}
-
-func (stack Stack) Title() string {
-	return RightPadTrim(stack.Name, int(float64(listWidth)*0.8))
-}
-
-func (stack Stack) Description() string {
+func (si stackItem) Title() string {
 	var status string
-	switch stack.FetchStatus {
-	case StatusFetched:
-		switch stack.OuttaSync {
+	switch si.fetchStatus {
+	case statusFetched:
+		switch si.outtaSync {
 		case true:
 			status = outtaSyncStyle.Render("outta sync")
 		case false:
 			status = insSyncStyle.Render("in sync")
 		}
-	case StatusFetching:
+	case statusFetching:
 		status = fetchingStyle.Render("...")
-	case StatusFailure:
+	case statusFailure:
 		status = errorStyle.Render("error")
 	}
-	var desc string
-
-	var descBudget = int(float64(listWidth) * 0.5)
-
-	if stack.Err != nil {
-		desc = RightPadTrim(stack.Err.Error(), int(float64(listWidth)*0.5))
-	} else {
-		if stack.Tags != nil {
-			var tagsLength int
-			for _, tag := range stack.Tags {
-				nextTag := RightPadTrim(fmt.Sprintf("#%s ", tag), tagWidth)
-				if tagsLength+tagWidth > descBudget {
-					break
-				}
-				desc += tagStyle(tag).Render(nextTag)
-				tagsLength += tagWidth + 1 // +1 is due to PaddingRight in the style
-			}
-			for i := 0; i < descBudget-tagsLength; i++ {
-				desc += " "
-			}
-		} else {
-			desc = RightPadTrim("@"+stack.AwsProfile, int(float64(listWidth)*0.5))
-		}
-	}
-
+	name := RightPadTrim(si.stack.Name, stackNamePadding)
 	return fmt.Sprintf("%s %s",
-		desc,
+		name,
 		status,
 	)
 }
 
-func (stack Stack) FilterValue() string { return stack.Name }
+func (si stackItem) Description() string {
+	var desc string
 
-type delegateKeyMap struct {
-	choose             key.Binding
-	chooseAll          key.Binding
-	refreshCredentials key.Binding
-	showDiff           key.Binding
-	filterOuttaSync    key.Binding
-	filterInSync       key.Binding
-	filterErrors       key.Binding
-	close              key.Binding
+	if si.err != nil {
+		return si.err.Error()
+	}
+
+	if si.stack.Tags != nil {
+		for _, tag := range si.stack.Tags {
+			nextTag := RightPadTrim(fmt.Sprintf("#%s ", tag), tagWidth)
+			desc += tagStyle(tag).Render(nextTag)
+		}
+		return desc
+	}
+
+	return fmt.Sprintf("@%s", si.stack.AwsProfile)
 }
 
-type StackSyncResult struct {
-	Stack        Stack
-	TemplateBody string
-	Outtasync    bool
-	Err          error
-}
+func (si stackItem) FilterValue() string { return si.stack.Name }

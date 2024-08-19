@@ -3,11 +3,9 @@ package ui
 import (
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-
-	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/dhth/outtasync/internal/aws"
 )
 
 type stateView uint
@@ -25,21 +23,11 @@ const (
 	stacksFilterInSync
 )
 
-type AwsConfig struct {
-	Config aws.Config
-	Err    error
-}
-
-type AwsCFClient struct {
-	Client *cloudformation.Client
-	Err    error
-}
-
-type model struct {
-	awsConfigs        map[string]AwsConfig
+type Model struct {
+	awsConfigs        map[string]aws.Config
 	state             stateView
 	stacksList        list.Model
-	stacksListReserve map[string]Stack
+	stacksListReserve map[string]stackItem
 	stacksFilter      stackFilter
 	checkOnStart      bool
 	message           string
@@ -49,15 +37,14 @@ type model struct {
 	showHelp          bool
 }
 
-func (m model) Init() tea.Cmd {
-
+func (m Model) Init() tea.Cmd {
 	var cmds []tea.Cmd
 
 	cmds = append(cmds, hideHelp(time.Minute*1))
 
 	if m.checkOnStart {
 		for i, stack := range m.stacksList.Items() {
-			if st, ok := stack.(Stack); ok {
+			if st, ok := stack.(stackItem); ok {
 				cmds = append(cmds, StackChosen(i, st))
 			}
 		}

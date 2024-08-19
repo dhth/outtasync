@@ -6,11 +6,9 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var (
-	listWidth = 140
-)
+var defaultListWidth = 140
 
-func (m model) View() string {
+func (m Model) View() string {
 	var content string
 	var footer string
 
