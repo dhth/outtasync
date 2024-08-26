@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.30.4
 	github.com/aws/aws-sdk-go-v2/config v1.27.28
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.53.4
-	github.com/charmbracelet/bubbles v0.18.0
+	github.com/charmbracelet/bubbles v0.19.0
 	github.com/charmbracelet/bubbletea v0.27.0
 	github.com/charmbracelet/lipgloss v0.12.1
 	gopkg.in/yaml.v3 v3.0.1
@@ -38,7 +38,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
-	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sahilm/fuzzy v0.1.1 // indirect
