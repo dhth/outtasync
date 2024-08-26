@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.53.4
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.27.0
-	github.com/charmbracelet/lipgloss v0.12.1
+	github.com/charmbracelet/lipgloss v0.13.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
