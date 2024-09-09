@@ -6,8 +6,8 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.30.4
 	github.com/aws/aws-sdk-go-v2/config v1.27.31
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.53.5
-	github.com/charmbracelet/bubbles v0.19.0
-	github.com/charmbracelet/bubbletea v0.27.1
+	github.com/charmbracelet/bubbles v0.20.0
+	github.com/charmbracelet/bubbletea v1.1.0
 	github.com/charmbracelet/lipgloss v0.13.0
 	gopkg.in/yaml.v3 v3.0.1
 )
