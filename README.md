@@ -1,7 +1,9 @@
 # outtasync
 
-✨ Overview
----
+[![Build Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/outtasync/build.yml?style=flat-square)](https://github.com/dhth/outtasync/actions/workflows/build.yml)
+[![Vulncheck Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/outtasync/vulncheck.yml?style=flat-square&label=vulncheck)](https://github.com/dhth/outtasync/actions/workflows/vulncheck.yml)
+[![Latest Release](https://img.shields.io/github/release/dhth/outtasync.svg?style=flat-square)](https://github.com/dhth/outtasync/releases/latest)
+[![Commits Since Latest Release](https://img.shields.io/github/commits-since/dhth/outtasync/latest?style=flat-square)](https://github.com/dhth/outtasync/releases)
 
 `outtasync` helps users quickly identify the CloudFormation stacks that have
 gone out of sync with the state represented by their counterpart stack files.
@@ -26,7 +28,7 @@ brew install dhth/tap/outtasync
 go install github.com/dhth/outtasync@latest
 ```
 
-Or get the binaries directly from a [release][2]. Read more about verifying the
+Or get the binary directly from a [release][2]. Read more about verifying the
 authenticity of released artifacts [here](#-verifying-release-artifacts).
 
 🛠️ Pre-requisites
@@ -198,12 +200,6 @@ you want):
    ./outtasync
    # profit!
    ```
-
-TODO
----
-
-- [ ] Add a command to generate a sample config file
-- [x] Add CLI mode
 
 Acknowledgements
 ---
