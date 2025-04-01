@@ -1,6 +1,9 @@
-package ui
+package utils
 
-import "strings"
+import (
+	"path/filepath"
+	"strings"
+)
 
 func RightPadTrim(s string, length int) string {
 	if len(s) >= length {
@@ -20,4 +23,11 @@ func Trim(s string, length int) string {
 		return s[:length]
 	}
 	return s
+}
+
+func ExpandTilde(path string, homeDir string) string {
+	if strings.HasPrefix(path, "~/") {
+		return filepath.Join(homeDir, path[2:])
+	}
+	return path
 }

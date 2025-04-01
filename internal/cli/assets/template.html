@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{{.Title}}</title>
+</head>
+<body class="bg-[#282828] text-[#f2e5bc] text-xl">
+    <div class="mx-auto p-4 mt-10 w-2/3">
+        <h1 class="text-[#fabd2f] text-3xl mb-4 font-bold">{{.Title}}</h1>
+        <p class="text-[#928374] italic">Generated at {{.Timestamp}}</p>
+        <table class="table-auto text-right mt-8">
+            <thead>
+                <tr class="text-[#fbf1c7] bg-[#3c3836] border-2 border-[#3c3836]">
+                    <th class="px-10 py-2">Stack</th>
+                    {{if .ShowTemplateResults}}
+                    <th class="px-10 py-2 font-bold ">Template in sync</th>
+                    {{end -}}
+                    {{if .ShowDriftResults}}
+                    <th class="px-10 py-2 font-bold ">No drift</th>
+                    {{end -}}
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Rows -}}
+                <tr class="border-2 border-[#3c3836]">
+                    <td class="px-10 py-2">{{.StackName}}</td>
+                    {{if $.ShowTemplateResults}}
+                        {{if .TemplateCheckErrored}}
+                        <td class="px-10 py-2 text-[#928374] font-bold ">{{.TemplateCheckValue}}</td>
+                        {{else if .TemplateInSync}}
+                        <td class="px-10 py-2 text-[#b8bb26] font-bold ">{{.TemplateCheckValue}}</td>
+                        {{else}}
+                        <td class="px-10 py-2 text-[#fb4934] font-bold ">{{.TemplateCheckValue}}</td>
+                        {{end -}}
+                    {{end -}}
+                    {{if $.ShowDriftResults}}
+                        {{if .DriftCheckError}}
+                        <td class="px-10 py-2 text-[#928374] font-bold ">{{.DriftCheckValue}}</td>
+                        {{else if .NoDrift}}
+                        <td class="px-10 py-2 text-[#b8bb26] font-bold ">{{.DriftCheckValue}}</td>
+                        {{else}}
+                        <td class="px-10 py-2 text-[#fb4934] font-bold ">{{.DriftCheckValue}}</td>
+                        {{end -}}
+                    {{end -}}
+                </tr>
+                {{end -}}
+            </tbody>
+        </table>
+
+        {{if .Errors }}
+        <h2 class="text-xl text-[#928374] font-bold mt-10 mb-4">Errors</h2>
+        {{range $error := .Errors -}}
+        <p class="text-[#bdae93]">{{$error}}</p>
+        {{end -}}
+        {{end -}}
+        <p class="text-[#928374] italic my-20 border-[#928374] border-t-2 pt-2 border-opacity-20">Built using <a class="font-bold" href="https://github.com/dhth/outtasync" target="_blank">outtasync</a></p>
+    </div>
+</body>
+</html>

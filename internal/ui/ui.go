@@ -12,7 +12,7 @@ import (
 
 var errCouldntSetUpDebugLogging = errors.New("couldn't set up debug logging")
 
-func RenderUI(stacks []types.Stack, awsCfgs map[string]aws.Config, checkOnStart bool) error {
+func RenderUI(stacks []types.Stack, cfClients map[string]aws.CFClient) error {
 	if len(os.Getenv("DEBUG")) > 0 {
 		f, err := tea.LogToFile("debug.log", "debug")
 		if err != nil {
@@ -21,7 +21,7 @@ func RenderUI(stacks []types.Stack, awsCfgs map[string]aws.Config, checkOnStart 
 		defer f.Close()
 	}
 
-	p := tea.NewProgram(InitialModel(stacks, awsCfgs, checkOnStart), tea.WithAltScreen())
+	p := tea.NewProgram(InitialModel(stacks, cfClients), tea.WithAltScreen())
 	_, err := p.Run()
 	if err != nil {
 		return err

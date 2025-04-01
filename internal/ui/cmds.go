@@ -2,36 +2,67 @@ package ui
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/dhth/outtasync/internal/aws"
+	"github.com/dhth/outtasync/internal/types"
 )
 
-func StackChosen(index int, si stackItem) tea.Cmd {
+func checkStackDrift(
+	awsConfig aws.CFClient, index int, stackItem stackItem, throttled bool,
+) tea.Cmd {
 	return func() tea.Msg {
-		return CheckStackStatus{index, si}
+		driftCheckResult := aws.CheckStackDriftStatus(awsConfig, stackItem.stack)
+		return DriftCheckUpdated{
+			index:     index,
+			result:    driftCheckResult,
+			throttled: throttled,
+		}
 	}
 }
 
-func refreshCredentials(cmd string) tea.Cmd {
-	cmdEls := strings.Split(cmd, " ")
-	c := exec.Command(cmdEls[0], cmdEls[1:]...)
-	return tea.ExecProcess(c, func(err error) tea.Msg {
-		if err != nil {
-			return CredentialsRefreshedMsg{err}
+func showDiff(template, actual string) tea.Cmd {
+	tmpFileTemplate, createTmpFileForTemplateErr := os.CreateTemp("", "outtasync-*.yml")
+	defer func() {
+		_ = tmpFileTemplate.Close()
+	}()
+	if createTmpFileForTemplateErr != nil {
+		return func() tea.Msg {
+			return ShowDiffFinished{createTmpFileForTemplateErr}
 		}
-		return tea.Msg(CredentialsRefreshedMsg{})
-	})
-}
+	}
 
-func showDiff(si stackItem) tea.Cmd {
+	_, writeTemplateErr := tmpFileTemplate.WriteString(template)
+	if writeTemplateErr != nil {
+		return func() tea.Msg {
+			return ShowDiffFinished{writeTemplateErr}
+		}
+	}
+
+	tmpFileActual, createTmpFileForActualErr := os.CreateTemp("", "outtasync-*.yml")
+	defer func() {
+		_ = tmpFileActual.Close()
+	}()
+	if createTmpFileForActualErr != nil {
+		return func() tea.Msg {
+			return ShowDiffFinished{createTmpFileForActualErr}
+		}
+	}
+
+	_, writeActualErr := tmpFileActual.WriteString(actual)
+	if writeActualErr != nil {
+		return func() tea.Msg {
+			return ShowDiffFinished{writeActualErr}
+		}
+	}
+
 	c := exec.Command("bash", "-c",
-		fmt.Sprintf("cat << 'EOF' | git diff --dst-prefix='Actual Cloudformation stack' --no-index -- %s -\n%s\nEOF",
-			si.stack.Local,
-			si.stack.Template,
+		fmt.Sprintf("git diff --src-prefix='Template ' --dst-prefix='Actual ' --no-index -- %s %s",
+			tmpFileTemplate.Name(),
+			tmpFileActual.Name(),
 		))
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		if err != nil {
@@ -41,10 +72,27 @@ func showDiff(si stackItem) tea.Cmd {
 	})
 }
 
-func showFile(filePath string) tea.Cmd {
+func showTemplate(templateCode string) tea.Cmd {
+	tmpFile, err := os.CreateTemp("", "outtasync-*.yml")
+	defer func() {
+		_ = tmpFile.Close()
+	}()
+	if err != nil {
+		return func() tea.Msg {
+			return ShowFileFinished{err}
+		}
+	}
+
+	if _, err := tmpFile.WriteString(templateCode); err != nil {
+		if err != nil {
+			return func() tea.Msg {
+				return ShowFileFinished{err}
+			}
+		}
+	}
 	c := exec.Command("bash", "-c",
 		fmt.Sprintf("cat %s | less",
-			filePath,
+			tmpFile.Name(),
 		))
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		if err != nil {
@@ -54,14 +102,33 @@ func showFile(filePath string) tea.Cmd {
 	})
 }
 
-func getCFTemplateBody(awsConfig aws.Config, index int, stackItem stackItem) tea.Cmd {
+func getCFTemplateBody(
+	cfClient aws.CFClient,
+	index int,
+	stackName,
+	stackKey,
+	templatePath string,
+	remoteCallHeaders []types.TemplateRemoteCallHeaders,
+	throttled bool,
+) tea.Cmd {
 	return func() tea.Msg {
-		stackSyncStatus := aws.CheckStackSyncStatus(awsConfig, stackItem.stack)
+		result := aws.CompareStackTemplateCode(cfClient, stackName, stackKey, templatePath, remoteCallHeaders)
 
-		if awsConfig.Err != nil {
-			return TemplateFetchedMsg{index, stackItem, "", false, awsConfig.Err}
+		if cfClient.Err != nil {
+			return TemplateFetchedMsg{
+				index:     index,
+				throttled: throttled,
+				err:       cfClient.Err,
+			}
 		}
-		return TemplateFetchedMsg{index, stackItem, stackSyncStatus.TemplateBody, stackSyncStatus.Outtasync, stackSyncStatus.Err}
+		return TemplateFetchedMsg{
+			index:          index,
+			templateCode:   result.TemplateCode,
+			actualTemplate: result.ActualTemplate,
+			mismatch:       result.Mismatch,
+			throttled:      throttled,
+			err:            result.Err,
+		}
 	}
 }
 

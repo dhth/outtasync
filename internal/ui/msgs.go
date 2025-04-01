@@ -1,18 +1,29 @@
 package ui
 
+import (
+	"github.com/dhth/outtasync/internal/types"
+)
+
 type (
-	DiffFinishedMsg         struct{}
-	ShowErrorFinishedMsg    struct{}
-	CredentialsRefreshedMsg struct{ err error }
-	ShowDiffFinished        struct{ err error }
-	ShowFileFinished        struct{ err error }
+	DiffFinishedMsg      struct{}
+	ShowErrorFinishedMsg struct{}
+	ShowDiffFinished     struct{ err error }
+	ShowFileFinished     struct{ err error }
 )
 
 type TemplateFetchedMsg struct {
-	index     int
-	stackItem stackItem
-	template  string
-	outtaSync bool
-	err       error
+	index          int
+	templateCode   string
+	actualTemplate string
+	mismatch       bool
+	throttled      bool
+	err            error
 }
+
+type DriftCheckUpdated struct {
+	index     int
+	result    types.StackDriftCheckResult
+	throttled bool
+}
+
 type hideHelpMsg struct{}
