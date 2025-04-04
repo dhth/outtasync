@@ -16,4 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed outtasync's config file format to allow for optional template paths
 
+### Removed
+
+- Ability to refresh AWS credentials directly from the TUI
+
 [unreleased]: https://github.com/dhth/ecscope/compare/v1.2.1...HEAD
