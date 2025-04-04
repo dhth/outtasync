@@ -51,11 +51,14 @@ func getDefaultReport(
 					row = append(row, errorStyle.Render(fmt.Sprintf("error [%d]", len(errors))))
 				}
 			}
+			row[i] = stackErrorResultStyle.Render(row[0])
 			rows[i] = row
+
 			continue
 		}
 
-		isNegative := false
+		hasError := false
+		hasNegativeResult := false
 
 		if showTemplateResults {
 			if result.syncResult == nil {
@@ -64,10 +67,11 @@ func getDefaultReport(
 				if result.syncResult.Err != nil {
 					errors = append(errors, result.syncResult.Err.Error())
 					row = append(row, errorStyle.Render(fmt.Sprintf("error [%d]", len(errors))))
+					hasError = true
 				} else {
 					if result.syncResult.Mismatch {
 						row = append(row, outtaSyncStyle.Render(no))
-						isNegative = true
+						hasNegativeResult = true
 					} else {
 						row = append(row, inSyncStyle.Render(yes))
 					}
@@ -82,24 +86,34 @@ func getDefaultReport(
 				if result.driftResult.Err != nil {
 					errors = append(errors, result.driftResult.Err.Error())
 					row = append(row, errorStyle.Render(fmt.Sprintf("error [%d]", len(errors))))
+					hasError = true
 				} else {
 					if result.driftResult.Output.DetectionStatus == cftypes.StackDriftDetectionStatusDetectionComplete {
 						if result.driftResult.Output.StackDriftStatus == cftypes.StackDriftStatusDrifted {
 							row = append(row, outtaSyncStyle.Render(no))
-							isNegative = true
+							hasNegativeResult = true
 						} else {
 							row = append(row, inSyncStyle.Render(yes))
 						}
 					} else {
 						errors = append(errors, fmt.Sprintf("drift detection could not be completed, detection status: %v", result.driftResult.Output.DetectionStatus))
 						row = append(row, errorStyle.Render(fmt.Sprintf("error [%d]", len(errors))))
+						hasError = true
 					}
 				}
 			}
 		}
 
-		if listNegativesOnly && !isNegative {
+		if listNegativesOnly && !hasNegativeResult {
 			continue
+		}
+
+		if hasNegativeResult {
+			row[0] = stackNegativeResultStyle.Render(row[0])
+		} else if hasError {
+			row[0] = stackErrorResultStyle.Render(row[0])
+		} else {
+			row[0] = stackPositiveResultStyle.Render(row[0])
 		}
 
 		rows[i] = row
@@ -115,22 +129,22 @@ func getDefaultReport(
 		outputLines = append(outputLines,
 			fmt.Sprintf("%s\t%s\t%s",
 				stackHeadingStyle.Render("stack"),
-				statusHeadingStyle.Render("template-in-sync"),
-				statusHeadingStyle.Render("no-drift"),
+				statusStyle.Render("template-in-sync"),
+				statusStyle.Render("no-drift"),
 			),
 		)
 	} else if showTemplateResults {
 		outputLines = append(outputLines,
 			fmt.Sprintf("%s\t%s",
 				stackHeadingStyle.Render("stack"),
-				statusHeadingStyle.Render("template-in-sync"),
+				statusStyle.Render("template-in-sync"),
 			),
 		)
 	} else {
 		outputLines = append(outputLines,
 			fmt.Sprintf("%s\t%s",
 				stackHeadingStyle.Render("stack"),
-				statusHeadingStyle.Render("no-drift"),
+				statusStyle.Render("no-drift"),
 			),
 		)
 	}
@@ -268,6 +282,7 @@ func getHTMLReport(
 				} else {
 					row.TemplateCheckValue = fmt.Sprintf("error [%d]", len(errors))
 					row.TemplateCheckErrored = true
+					row.HasError = true
 				}
 			}
 			if showDriftResults {
@@ -276,13 +291,12 @@ func getHTMLReport(
 				} else {
 					row.DriftCheckValue = fmt.Sprintf("error [%d]", len(errors))
 					row.DriftCheckError = true
+					row.HasError = true
 				}
 			}
 			rows[i] = row
 			continue
 		}
-
-		isNegative := false
 
 		if showTemplateResults {
 			if result.syncResult == nil {
@@ -292,10 +306,11 @@ func getHTMLReport(
 					errors = append(errors, fmt.Sprintf("[%d] %s", len(errors)+1, result.syncResult.Err.Error()))
 					row.TemplateCheckValue = fmt.Sprintf("error [%d]", len(errors))
 					row.TemplateCheckErrored = true
+					row.HasError = true
 				} else {
 					if result.syncResult.Mismatch {
 						row.TemplateCheckValue = no
-						isNegative = true
+						row.HasNegativeResult = true
 					} else {
 						row.TemplateCheckValue = yes
 						row.TemplateInSync = true
@@ -312,12 +327,13 @@ func getHTMLReport(
 					errors = append(errors, fmt.Sprintf("[%d] %s", len(errors)+1, result.driftResult.Err.Error()))
 					row.DriftCheckValue = fmt.Sprintf("error [%d]", len(errors))
 					row.DriftCheckError = true
+					row.HasError = true
 				} else {
 					if result.driftResult.Output.DetectionStatus == cftypes.StackDriftDetectionStatusDetectionComplete {
 						if result.driftResult.Output.StackDriftStatus == cftypes.StackDriftStatusDrifted {
 							row.DriftCheckValue = no
 							row.NoDrift = false
-							isNegative = true
+							row.HasNegativeResult = true
 						} else {
 							row.DriftCheckValue = yes
 							row.NoDrift = true
@@ -326,12 +342,13 @@ func getHTMLReport(
 						errors = append(errors, fmt.Sprintf("[%d] drift detection could not be completed, detection status: %v", len(errors)+1, result.driftResult.Output.DetectionStatus))
 						row.DriftCheckValue = fmt.Sprintf("error [%d]", len(errors))
 						row.DriftCheckError = true
+						row.HasError = true
 					}
 				}
 			}
 		}
 
-		if listNegativesOnly && !isNegative {
+		if listNegativesOnly && !row.HasNegativeResult {
 			continue
 		}
 
@@ -389,6 +406,8 @@ type CheckReportHTMLData struct {
 
 type HTMLDataRow struct {
 	StackName            string
+	HasNegativeResult    bool
+	HasError             bool
 	TemplateCheckValue   string
 	TemplateInSync       bool
 	TemplateCheckErrored bool

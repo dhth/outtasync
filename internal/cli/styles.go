@@ -18,7 +18,6 @@ var (
 			Width(60)
 
 	stackHeadingStyle = stackNameStyle.
-				Foreground(lipgloss.Color(headingColor)).
 				Bold(true)
 
 	statusStyle = lipgloss.NewStyle().
@@ -26,11 +25,17 @@ var (
 			Align(lipgloss.Left).
 			Width(20)
 
-	statusHeadingStyle = statusStyle.
-				Foreground(lipgloss.Color(headingColor))
-
 	inSyncStyle = statusStyle.
 			Foreground(lipgloss.Color(inSyncColor))
+
+	stackPositiveResultStyle = stackNameStyle.
+					Foreground(lipgloss.Color(inSyncColor))
+
+	stackErrorResultStyle = stackNameStyle.
+				Foreground(lipgloss.Color(errorColor))
+
+	stackNegativeResultStyle = stackNameStyle.
+					Foreground(lipgloss.Color(outtaSyncColor))
 
 	outtaSyncStyle = statusStyle.
 			Foreground(lipgloss.Color(outtaSyncColor))

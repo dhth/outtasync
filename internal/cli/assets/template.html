@@ -25,7 +25,13 @@
             <tbody>
                 {{range .Rows -}}
                 <tr class="border-2 border-[#3c3836]">
-                    <td class="px-10 py-2">{{.StackName}}</td>
+                    {{if .HasNegativeResult}}
+                    <td class="px-10 py-2 text-[#fb4934]">{{.StackName}}</td>
+                    {{else if .HasError}}
+                    <td class="px-10 py-2 text-[#928374]">{{.StackName}}</td>
+                    {{else}}
+                    <td class="px-10 py-2 text-[#b8bb26]">{{.StackName}}</td>
+                    {{end -}}
                     {{if $.ShowTemplateResults}}
                         {{if .TemplateCheckErrored}}
                         <td class="px-10 py-2 text-[#928374] font-bold ">{{.TemplateCheckValue}}</td>
