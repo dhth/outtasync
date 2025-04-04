@@ -77,7 +77,7 @@ func CompareStackTemplateCode(
 	return types.StackTemplateCompared{
 		StackKey:       stackKey,
 		TemplateCode:   localTemplate,
-		ActualTemplate: templBody,
+		ActualTemplate: templBody+"\n",
 		Mismatch:       mismatch,
 	}
 }
