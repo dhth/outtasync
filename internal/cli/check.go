@@ -190,14 +190,14 @@ func showLoadingSpinner(done chan bool,
 			for _, r := range spinner {
 				if showComparisonStatus && showDriftStatus {
 					if totalTemplateChecks > 0 {
-						fmt.Fprintf(os.Stderr, "\r%c templates checked: %d/%d; drift checked: %d/%d", r, numTemplatesChecked, totalTemplateChecks, numDriftChecked, totalDriftChecks)
+						fmt.Fprintf(os.Stderr, "\r\033[K%c templates checked: %d/%d; drift checked: %d/%d", r, numTemplatesChecked, totalTemplateChecks, numDriftChecked, totalDriftChecks)
 					} else {
-						fmt.Fprintf(os.Stderr, "\r%c no templates configured; drift checked: %d/%d", r, numDriftChecked, totalDriftChecks)
+						fmt.Fprintf(os.Stderr, "\r\033[K%c no templates configured; drift checked: %d/%d", r, numDriftChecked, totalDriftChecks)
 					}
 				} else if showComparisonStatus {
-					fmt.Fprintf(os.Stderr, "\r%c templates checked: %d/%d", r, numTemplatesChecked, totalTemplateChecks)
+					fmt.Fprintf(os.Stderr, "\r\033[K%c templates checked: %d/%d", r, numTemplatesChecked, totalTemplateChecks)
 				} else {
-					fmt.Fprintf(os.Stderr, "\r%c drift checked: %d/%d", r, numDriftChecked, totalDriftChecks)
+					fmt.Fprintf(os.Stderr, "\r\033[K%c drift checked: %d/%d", r, numDriftChecked, totalDriftChecks)
 				}
 				time.Sleep(100 * time.Millisecond)
 			}
