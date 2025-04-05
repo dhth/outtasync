@@ -16,6 +16,7 @@ const (
 	codeMismatchStacksList
 	driftedStacksList
 	erroredStacksList
+	result
 	errorDetailsPane
 )
 
@@ -26,6 +27,8 @@ type Model struct {
 	codeMismatchStacksList  list.Model
 	driftedStacksList       list.Model
 	erroredStacksList       list.Model
+	resultVP                viewport.Model
+	resultVPReady           bool
 	stackErrorVP            viewport.Model
 	stackErrorVPReady       bool
 	message                 string

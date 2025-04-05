@@ -55,6 +55,7 @@ func NewRootCommand() (*cobra.Command, error) {
 		listNegativesOnly           bool
 		checkHTMLOutputTitle        string
 		checkHTMLOutputTemplateFile string
+		checkHTMLOpen               bool
 
 		genConfigConfigSource string
 		genConfigFilterStr    string
@@ -63,7 +64,8 @@ func NewRootCommand() (*cobra.Command, error) {
 
 	rootCmd := &cobra.Command{
 		Use:          "outtasync",
-		Short:        "outtasync lets you identify Cloudformation stacks that have drifted or gone out of sync with the state represented by their stack files",
+		Short:        `outtasync helps you identify Cloudformation stacks that have drifted or gone out of sync
+with the state represented by their template files.`,
 		SilenceUsage: true,
 	}
 
@@ -149,9 +151,10 @@ func NewRootCommand() (*cobra.Command, error) {
 				htmlOutputConf = types.CheckHTMLOutputConfig{
 					Title:    checkHTMLOutputTitle,
 					Template: htmlOutputTemplate,
+					Open:     checkHTMLOpen,
 				}
 			}
-			cli.ShowCheckResults(stacks,
+			return cli.ShowCheckResults(stacks,
 				cfClients,
 				compareWithCode,
 				checkDrift,
@@ -160,8 +163,6 @@ func NewRootCommand() (*cobra.Command, error) {
 				listNegativesOnly,
 				&htmlOutputConf,
 			)
-
-			return nil
 		},
 	}
 
@@ -299,8 +300,9 @@ func NewRootCommand() (*cobra.Command, error) {
 	checkCmd.Flags().BoolVarP(&checkDrift, "check-drift", "D", true, "check drift status (only applicable in cli mode)")
 	checkCmd.Flags().StringVarP(&checkOutputFormat, "format", "f", "default", fmt.Sprintf("output format [possible values: %s]", strings.Join(types.CheckOutputFormatPossibleValues(), ", ")))
 	checkCmd.Flags().BoolVarP(&listNegativesOnly, "list-negatives-only", "N", false, "list negatives only")
-	checkCmd.Flags().StringVar(&checkHTMLOutputTitle, "html-title", "outtasync", "title of the html output (only applicable in cli mode, when --format=html)")
+	checkCmd.Flags().StringVar(&checkHTMLOutputTitle, "html-title", "outtasync", "title of the html output")
 	checkCmd.Flags().StringVar(&checkHTMLOutputTemplateFile, "html-template-file", "", "location of the template file to use for html output")
+	checkCmd.Flags().BoolVarP(&checkHTMLOpen, "html-open", "o", false, "open html output in browser instead of outputting to stdout")
 
 	tuiCmd.Flags().StringVarP(&nameFilterStr, "name-filter", "n", "", "regex for name(s) (configured in outtasync's config) to filter stacks by")
 	tuiCmd.Flags().StringVarP(&tagsFilterStr, "tags-filter", "t", "", "regex for tag(s) to filter stacks by")

@@ -10,6 +10,7 @@ import (
 
 	cftypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 	"github.com/dhth/outtasync/internal/types"
+	"github.com/dhth/outtasync/internal/utils"
 )
 
 //go:embed assets/template.html
@@ -267,8 +268,9 @@ func getHTMLReport(
 	showDriftResults bool,
 	listNegativesOnly bool,
 	htmlOutputConfig *types.CheckHTMLOutputConfig,
-) string {
+) (string, error) {
 	var errors []string
+	var diffs []HTMLDiff
 	rows := make([]HTMLDataRow, len(stacks))
 	for i, stack := range stacks {
 		result, ok := results[stack.Key()]
@@ -311,6 +313,18 @@ func getHTMLReport(
 					if result.syncResult.Mismatch {
 						row.TemplateCheckValue = no
 						row.HasNegativeResult = true
+						diffBytes, err := utils.GetDiff(result.syncResult.TemplateCode, result.syncResult.ActualTemplate)
+						if err != nil {
+							diffs = append(diffs, HTMLDiff{
+								StackName: stack.Name,
+								Diff:      err.Error(),
+							})
+						} else {
+							diffs = append(diffs, HTMLDiff{
+								StackName: stack.Name,
+								Diff:      string(diffBytes),
+							})
+						}
 					} else {
 						row.TemplateCheckValue = yes
 						row.TemplateInSync = true
@@ -355,10 +369,6 @@ func getHTMLReport(
 		rows[i] = row
 	}
 
-	if len(rows) == 0 {
-		return ""
-	}
-
 	var title string
 	var htmlTemplate string
 	if htmlOutputConfig != nil {
@@ -374,6 +384,7 @@ func getHTMLReport(
 		Title:               title,
 		Timestamp:           time.Now().Format("2006-01-02 15:04:05 MST"),
 		Rows:                rows,
+		Diffs:               diffs,
 		Errors:              errors,
 		ShowTemplateResults: showTemplateResults,
 		ShowDriftResults:    showDriftResults,
@@ -383,7 +394,7 @@ func getHTMLReport(
 	var err error
 	tmpl, err = template.New("outtasync").Parse(htmlTemplate)
 	if err != nil {
-		fmt.Printf("error: %s", err.Error())
+		return "", err
 	}
 
 	var buf bytes.Buffer
@@ -392,7 +403,7 @@ func getHTMLReport(
 		fmt.Printf("error: %s", err.Error())
 	}
 
-	return buf.String()
+	return buf.String(), nil
 }
 
 type CheckReportHTMLData struct {
@@ -400,6 +411,7 @@ type CheckReportHTMLData struct {
 	Timestamp           string
 	Rows                []HTMLDataRow
 	Errors              []string
+	Diffs               []HTMLDiff
 	ShowTemplateResults bool
 	ShowDriftResults    bool
 }
@@ -414,4 +426,9 @@ type HTMLDataRow struct {
 	DriftCheckValue      string
 	NoDrift              bool
 	DriftCheckError      bool
+}
+
+type HTMLDiff struct {
+	StackName string
+	Diff      string
 }

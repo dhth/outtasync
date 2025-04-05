@@ -18,9 +18,9 @@ func CompareStackTemplateCode(
 	cfClient CFClient,
 	stackName, stackKey, templatePath string,
 	remoteCallHeaders []types.TemplateRemoteCallHeaders,
-) types.StackTemplateCompared {
+) types.TemplateCheckResult {
 	if cfClient.Err != nil {
-		return types.StackTemplateCompared{
+		return types.TemplateCheckResult{
 			StackKey: stackKey,
 			Err:      cfClient.Err,
 		}
@@ -37,13 +37,18 @@ func CompareStackTemplateCode(
 
 	templOut, err := client.GetTemplate(ctx, &templateInput)
 	if err != nil {
-		return types.StackTemplateCompared{
+		return types.TemplateCheckResult{
 			StackKey: stackKey,
 			Err:      err,
 		}
 	}
 
 	templBody := *templOut.TemplateBody
+
+	// to deal with "No newline at end of file" issues while diffing
+	if !strings.HasSuffix(templBody, "\n") {
+		templBody = templBody + "\n"
+	}
 
 	var localTemplate string
 
@@ -55,7 +60,7 @@ func CompareStackTemplateCode(
 
 		respBytes, err := utils.GetHTTPResponse(templatePath, headers)
 		if err != nil {
-			return types.StackTemplateCompared{
+			return types.TemplateCheckResult{
 				StackKey: stackKey,
 				Err:      err,
 			}
@@ -64,7 +69,7 @@ func CompareStackTemplateCode(
 	} else {
 		localFile, err := os.ReadFile(templatePath)
 		if err != nil {
-			return types.StackTemplateCompared{
+			return types.TemplateCheckResult{
 				StackKey: stackKey,
 				Err:      err,
 			}
@@ -72,12 +77,17 @@ func CompareStackTemplateCode(
 		localTemplate = string(localFile)
 	}
 
+	// to deal with "No newline at end of file" issues while diffing
+	if !strings.HasSuffix(localTemplate, "\n") {
+		localTemplate = localTemplate + "\n"
+	}
+
 	mismatch := localTemplate != templBody
 
-	return types.StackTemplateCompared{
+	return types.TemplateCheckResult{
 		StackKey:       stackKey,
 		TemplateCode:   localTemplate,
-		ActualTemplate: templBody + "\n",
+		ActualTemplate: templBody,
 		Mismatch:       mismatch,
 	}
 }

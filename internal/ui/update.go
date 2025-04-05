@@ -35,6 +35,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.activePane {
 			case errorDetailsPane:
 				m.activePane = stacksList
+			case result:
+				m.activePane = stacksList
 			case stacksList:
 				return m, tea.Quit
 			default:
@@ -59,7 +61,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				cmds = append(cmds, driftCmds...)
 			}
-		case "ctrl+d":
+		case "ctrl+s":
 			var si stackItem
 			var ok bool
 
@@ -165,6 +167,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.driftedStacksList.SetHeight(msg.Height - h - 2)
 		m.erroredStacksList.SetWidth(msg.Width - w - 2)
 		m.erroredStacksList.SetHeight(msg.Height - h - 2)
+
+		if !m.resultVPReady {
+			m.resultVP = viewport.New(msg.Width-4, msg.Height-5)
+			m.resultVP.HighPerformanceRendering = false
+			m.resultVPReady = true
+		} else {
+			m.resultVP.Width = msg.Width - 4
+			m.resultVP.Height = msg.Height - 5
+		}
 
 		if !m.stackErrorVPReady {
 			m.stackErrorVP = viewport.New(msg.Width-4, msg.Height-5)

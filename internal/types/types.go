@@ -96,7 +96,7 @@ func (s Stack) AWSConfigKey() string {
 	return s.ConfigSource.Value
 }
 
-type StackTemplateCompared struct {
+type TemplateCheckResult struct {
 	StackKey       string
 	TemplateCode   string
 	ActualTemplate string
@@ -208,6 +208,7 @@ const (
 type CheckHTMLOutputConfig struct {
 	Title    string
 	Template string
+	Open     bool
 }
 
 func ParseCheckOutputFormat(value string) (CheckOutputFormat, bool) {

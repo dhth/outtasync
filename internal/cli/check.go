@@ -1,8 +1,11 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"os/exec"
+	"runtime"
 	"sync"
 	"time"
 
@@ -10,9 +13,16 @@ import (
 	"github.com/dhth/outtasync/internal/types"
 )
 
+var (
+	errUnsupportedPlatformForHTMLOpen = errors.New("opening HTML output is not supported on this platform")
+	errCouldntGenerateHTMLOutput      = errors.New("couldn't generate HTML output")
+	errCouldntRunOpenCmd              = errors.New("couldn't run command for opening local web page")
+	errCouldntOpenHTMLOutput          = errors.New("couldn't open generated HTML output")
+)
+
 type result struct {
 	stack       types.Stack
-	syncResult  *types.StackTemplateCompared
+	syncResult  *types.TemplateCheckResult
 	driftResult *types.StackDriftCheckResult
 }
 
@@ -23,7 +33,7 @@ func ShowCheckResults(
 	format types.CheckOutputFormat,
 	listNegativesOnly bool,
 	htmlOutputConfig *types.CheckHTMLOutputConfig,
-) {
+) error {
 	done := make(chan bool)
 	templateChan := make(chan struct{})
 	driftChan := make(chan struct{})
@@ -46,7 +56,7 @@ func ShowCheckResults(
 		}
 	}
 	if len(stacksToCheck) == 0 {
-		return
+		return nil
 	}
 
 	showProgressIndicator = showProgressIndicator && len(stacksToCheck) >= 1
@@ -57,7 +67,7 @@ func ShowCheckResults(
 
 	syncSemaphore := make(chan struct{}, 10)
 	driftSemaphore := make(chan struct{}, 3)
-	syncResultChannel := make(chan types.StackTemplateCompared)
+	syncResultChannel := make(chan types.TemplateCheckResult)
 	var syncWg sync.WaitGroup
 	driftResultChan := make(chan types.StackDriftCheckResult)
 	var driftWg sync.WaitGroup
@@ -153,20 +163,32 @@ func ShowCheckResults(
 	close(driftChan)
 
 	if len(results) == 0 {
-		return
+		return nil
 	}
 
-	var report string
 	switch format {
 	case types.Default:
-		report = getDefaultReport(results, stacksToCheck, checkTemplate, checkDrift, listNegativesOnly)
+		report := getDefaultReport(results, stacksToCheck, checkTemplate, checkDrift, listNegativesOnly)
+		fmt.Println(report)
 	case types.Delimited:
-		report = getDelimitedReport(results, stacksToCheck, checkTemplate, checkDrift, listNegativesOnly)
+		report := getDelimitedReport(results, stacksToCheck, checkTemplate, checkDrift, listNegativesOnly)
+		fmt.Println(report)
 	case types.HTML:
-		report = getHTMLReport(results, stacksToCheck, checkTemplate, checkDrift, listNegativesOnly, htmlOutputConfig)
+		report, err := getHTMLReport(results, stacksToCheck, checkTemplate, checkDrift, listNegativesOnly, htmlOutputConfig)
+		if err != nil {
+			return fmt.Errorf("%w: %s", errCouldntGenerateHTMLOutput, err.Error())
+		}
+		if htmlOutputConfig != nil && htmlOutputConfig.Open {
+			err := openHTMLOutput(report)
+			if err != nil {
+				return fmt.Errorf("%w: %w", errCouldntOpenHTMLOutput, err)
+			}
+		} else {
+			fmt.Println(report)
+		}
 	}
 
-	fmt.Println(report)
+	return nil
 }
 
 func showLoadingSpinner(done chan bool,
@@ -203,4 +225,36 @@ func showLoadingSpinner(done chan bool,
 			}
 		}
 	}
+}
+
+func openHTMLOutput(output string) error {
+	tmpFileTemplate, err := os.CreateTemp("", "outtasync-*.html")
+	defer func() {
+		_ = tmpFileTemplate.Close()
+	}()
+	if err != nil {
+		return err
+	}
+
+	_, err = tmpFileTemplate.WriteString(output)
+	if err != nil {
+		return err
+	}
+
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = exec.Command("open", tmpFileTemplate.Name())
+	case "linux":
+		cmd = exec.Command("xdg-open", tmpFileTemplate.Name())
+	default:
+		return errUnsupportedPlatformForHTMLOpen
+	}
+
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("%w; command output: %s", errCouldntRunOpenCmd, out)
+	}
+
+	return nil
 }

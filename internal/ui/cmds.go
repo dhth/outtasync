@@ -83,11 +83,10 @@ func showTemplate(templateCode string) tea.Cmd {
 		}
 	}
 
-	if _, err := tmpFile.WriteString(templateCode); err != nil {
-		if err != nil {
-			return func() tea.Msg {
-				return ShowFileFinished{err}
-			}
+	_, writeErr := tmpFile.WriteString(templateCode)
+	if writeErr != nil {
+		return func() tea.Msg {
+			return ShowFileFinished{writeErr}
 		}
 	}
 	c := exec.Command("bash", "-c",
