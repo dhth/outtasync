@@ -7,50 +7,69 @@ import (
 )
 
 const (
-	defaultBackgroundColor = "#282828"
-	stackListColor         = "#fe8019"
-	modeColor              = "#b8bb26"
-	fetchingColor          = "#ebdbb2"
-	inSyncColor            = "#b8bb26"
-	outtaSyncColor         = "#fb4934"
-	errorColor             = "#928374"
-	helpMsgColor           = "#83a598"
+	defaultBackgroundColor  = "#282828"
+	stackListColor          = "#fe8019"
+	modeColor               = "#b8bb26"
+	fetchingColor           = "#ebdbb2"
+	inSyncColor             = "#b8bb26"
+	unknownDriftStatusColor = "#bdae93"
+	driftReasonColor        = "#fabd2f"
+	outtaSyncColor          = "#fb4934"
+	errorColor              = "#928374"
+	errorHeadingColor       = "#fabd2f"
+	helpMsgColor            = "#83a598"
 )
 
 var (
 	baseStyle = lipgloss.NewStyle().
-			PaddingLeft(1).
-			PaddingRight(1).
 			Foreground(lipgloss.Color(defaultBackgroundColor))
 
 	baseListStyle = lipgloss.NewStyle().
 			PaddingTop(1).
-			PaddingRight(2).
-			PaddingLeft(1).
 			PaddingBottom(1)
 
 	stackListStyle = baseListStyle
 
 	modeStyle = baseStyle.
+			PaddingLeft(1).
+			PaddingRight(1).
 			Align(lipgloss.Center).
 			Bold(true).
 			Background(lipgloss.Color(modeColor))
 
-	driftStatusStyle = baseStyle.
-				Bold(true).
-				Align(lipgloss.Center).
-				Width(12)
+	statusStyle = baseStyle.
+			Bold(true).
+			Align(lipgloss.Center).
+			Width(11)
 
-	fetchingStyle = driftStatusStyle.
+	fetchingStyle = statusStyle.
 			Background(lipgloss.Color(fetchingColor))
 
-	insSyncStyle = driftStatusStyle.
+	insSyncStyle = statusStyle.
 			Background(lipgloss.Color(inSyncColor))
 
-	outtaSyncStyle = driftStatusStyle.
+	outtaSyncStyle = statusStyle.
 			Background(lipgloss.Color(outtaSyncColor))
 
-	errorStyle = driftStatusStyle.
+	errorStyle = statusStyle.
+			Background(lipgloss.Color(errorColor))
+
+	driftCheckInProgressStyle = statusStyle.
+					Background(lipgloss.Color(fetchingColor))
+
+	driftedStyle = statusStyle.
+			Background(lipgloss.Color(outtaSyncColor))
+
+	notDriftedStyle = statusStyle.
+			Background(lipgloss.Color(inSyncColor))
+
+	unknownDriftStatusStyle = statusStyle.
+				Background(lipgloss.Color(unknownDriftStatusColor))
+
+	driftReasonStyle = statusStyle.
+				Foreground(lipgloss.Color(driftReasonColor))
+
+	driftErrorStyle = statusStyle.
 			Background(lipgloss.Color(errorColor))
 
 	msgStyle = lipgloss.NewStyle().
@@ -91,4 +110,14 @@ var (
 
 		return st
 	}
+
+	errorViewStyle = baseStyle.
+			PaddingLeft(1).
+			PaddingRight(1).
+			Bold(true).
+			Background(lipgloss.Color(errorColor)).
+			Align(lipgloss.Left)
+
+	errorDetailsHeadingStyle = baseStyle.
+					Foreground(lipgloss.Color(errorHeadingColor))
 )
