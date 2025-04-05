@@ -63,8 +63,8 @@ func NewRootCommand() (*cobra.Command, error) {
 	)
 
 	rootCmd := &cobra.Command{
-		Use:          "outtasync",
-		Short:        `outtasync helps you identify Cloudformation stacks that have drifted or gone out of sync
+		Use: "outtasync",
+		Short: `outtasync helps you identify Cloudformation stacks that have drifted or gone out of sync
 with the state represented by their template files.`,
 		SilenceUsage: true,
 	}

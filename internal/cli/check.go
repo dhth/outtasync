@@ -78,6 +78,8 @@ func ShowCheckResults(
 		results[stack.Key()] = result{stack: stack}
 	}
 
+	computeDiff := format == types.HTML
+
 	if checkTemplate {
 		for _, stack := range stacksToCheck {
 			cfgKey := stack.AWSConfigKey()
@@ -97,7 +99,12 @@ func ShowCheckResults(
 				defer func() {
 					<-syncSemaphore
 				}()
-				syncResultChannel <- aws.CompareStackTemplateCode(cfClient, stack.Name, stack.Key(), *stack.TemplatePath, stack.TemplateRemoteCallHeaders)
+				syncResultChannel <- aws.CompareStackTemplateCode(cfClient,
+					stack.Name,
+					stack.Key(),
+					*stack.TemplatePath,
+					stack.TemplateRemoteCallHeaders,
+					computeDiff)
 				if showProgressIndicator {
 					templateChan <- struct{}{}
 				}

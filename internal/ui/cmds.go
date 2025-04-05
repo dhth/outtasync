@@ -111,7 +111,7 @@ func getCFTemplateBody(
 	throttled bool,
 ) tea.Cmd {
 	return func() tea.Msg {
-		result := aws.CompareStackTemplateCode(cfClient, stackName, stackKey, templatePath, remoteCallHeaders)
+		result := aws.CompareStackTemplateCode(cfClient, stackName, stackKey, templatePath, remoteCallHeaders, false)
 
 		if cfClient.Err != nil {
 			return TemplateFetchedMsg{

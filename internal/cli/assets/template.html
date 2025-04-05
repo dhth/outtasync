@@ -60,7 +60,14 @@
         </table>
 
         {{if .Diffs }}
-        <h2 class="text-xl text-[#fb4934] font-bold mt-10">Diffs</h2>
+        <h2 class="text-xl text-[#fb4934] font-bold mt-10 flex justify-left items-center">
+            Diffs
+            <button 
+                class="bg-[#1d2021] text-[#928374] text-xs ml-4 px-4 py-2 hover:bg-[#83a598] hover:text-[#282828] focus:outline-none" 
+                onclick="toggleAllDetails()">
+                Toggle All
+            </button>
+        </h2>
         {{range .Diffs -}}
         <div class="my-2">
             <details>
@@ -81,4 +88,14 @@
         <p class="text-[#928374] italic my-10 border-[#928374] border-t-2 pt-2 border-opacity-20">Built using <a class="font-bold" href="https://github.com/dhth/outtasync" target="_blank">outtasync</a></p>
     </div>
 </body>
+    <script>
+        let allDetailsOpen = false;
+
+        function toggleAllDetails() {
+            allDetailsOpen = !allDetailsOpen;
+            document.querySelectorAll('details').forEach(detail => {
+                detail.open = allDetailsOpen;
+            });
+        }
+    </script>
 </html>

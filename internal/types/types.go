@@ -100,6 +100,8 @@ type TemplateCheckResult struct {
 	StackKey       string
 	TemplateCode   string
 	ActualTemplate string
+	Diff           []byte
+	DiffErr        error
 	Mismatch       bool
 	Err            error
 }

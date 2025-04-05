@@ -18,6 +18,7 @@ func CompareStackTemplateCode(
 	cfClient CFClient,
 	stackName, stackKey, templatePath string,
 	remoteCallHeaders []types.TemplateRemoteCallHeaders,
+	computeDiff bool,
 ) types.TemplateCheckResult {
 	if cfClient.Err != nil {
 		return types.TemplateCheckResult{
@@ -43,14 +44,14 @@ func CompareStackTemplateCode(
 		}
 	}
 
-	templBody := *templOut.TemplateBody
+	actualTemplate := *templOut.TemplateBody
 
 	// to deal with "No newline at end of file" issues while diffing
-	if !strings.HasSuffix(templBody, "\n") {
-		templBody = templBody + "\n"
+	if !strings.HasSuffix(actualTemplate, "\n") {
+		actualTemplate = actualTemplate + "\n"
 	}
 
-	var localTemplate string
+	var templateCode string
 
 	if strings.HasPrefix(templatePath, "https://") {
 		var headers [][2]string
@@ -65,7 +66,7 @@ func CompareStackTemplateCode(
 				Err:      err,
 			}
 		}
-		localTemplate = string(respBytes)
+		templateCode = string(respBytes)
 	} else {
 		localFile, err := os.ReadFile(templatePath)
 		if err != nil {
@@ -74,20 +75,28 @@ func CompareStackTemplateCode(
 				Err:      err,
 			}
 		}
-		localTemplate = string(localFile)
+		templateCode = string(localFile)
 	}
 
 	// to deal with "No newline at end of file" issues while diffing
-	if !strings.HasSuffix(localTemplate, "\n") {
-		localTemplate = localTemplate + "\n"
+	if !strings.HasSuffix(templateCode, "\n") {
+		templateCode = templateCode + "\n"
 	}
 
-	mismatch := localTemplate != templBody
+	mismatch := templateCode != actualTemplate
+
+	var diff []byte
+	var diffErr error
+	if computeDiff {
+		diff, diffErr = utils.GetDiff(templateCode, actualTemplate)
+	}
 
 	return types.TemplateCheckResult{
 		StackKey:       stackKey,
-		TemplateCode:   localTemplate,
-		ActualTemplate: templBody,
+		TemplateCode:   templateCode,
+		ActualTemplate: actualTemplate,
+		Diff:           diff,
+		DiffErr:        diffErr,
 		Mismatch:       mismatch,
 	}
 }

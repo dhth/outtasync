@@ -10,7 +10,6 @@ import (
 
 	cftypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 	"github.com/dhth/outtasync/internal/types"
-	"github.com/dhth/outtasync/internal/utils"
 )
 
 //go:embed assets/template.html
@@ -313,16 +312,15 @@ func getHTMLReport(
 					if result.syncResult.Mismatch {
 						row.TemplateCheckValue = no
 						row.HasNegativeResult = true
-						diffBytes, err := utils.GetDiff(result.syncResult.TemplateCode, result.syncResult.ActualTemplate)
-						if err != nil {
+						if result.syncResult.DiffErr != nil {
 							diffs = append(diffs, HTMLDiff{
 								StackName: stack.Name,
-								Diff:      err.Error(),
+								Diff:      result.syncResult.DiffErr.Error(),
 							})
 						} else {
 							diffs = append(diffs, HTMLDiff{
 								StackName: stack.Name,
-								Diff:      string(diffBytes),
+								Diff:      string(result.syncResult.Diff),
 							})
 						}
 					} else {
