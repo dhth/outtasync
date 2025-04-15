@@ -170,7 +170,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		if !m.resultVPReady {
 			m.resultVP = viewport.New(msg.Width-4, msg.Height-5)
-			m.resultVP.HighPerformanceRendering = false
 			m.resultVPReady = true
 		} else {
 			m.resultVP.Width = msg.Width - 4
@@ -179,7 +178,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		if !m.stackErrorVPReady {
 			m.stackErrorVP = viewport.New(msg.Width-4, msg.Height-5)
-			m.stackErrorVP.HighPerformanceRendering = false
 			m.stackErrorVPReady = true
 		} else {
 			m.stackErrorVP.Width = msg.Width - 4
