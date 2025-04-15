@@ -235,7 +235,7 @@ func ParseStackConfig(config StackConfig, homeDir string) (Stack, []error) {
 
 	return Stack{
 		Name:                      config.Name,
-		Arn:                       config.Arn,
+		Arn:                       os.ExpandEnv(config.Arn),
 		ConfigSource:              configSource,
 		TemplatePath:              local,
 		TemplateRemoteCallHeaders: config.RemoteCallHeaders,
