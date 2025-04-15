@@ -40,7 +40,7 @@ func GetAWSConfig(source types.ConfigSource) (aws.Config, error) {
 			return cfg, err
 		}
 		stsSvc := sts.NewFromConfig(cfg)
-		creds := stscreds.NewAssumeRoleProvider(stsSvc, "outtasync-session")
+		creds := stscreds.NewAssumeRoleProvider(stsSvc, source.Value)
 		cfg.Credentials = aws.NewCredentialsCache(creds)
 	}
 	return cfg, err

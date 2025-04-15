@@ -106,19 +106,19 @@ with the state represented by their template files.`,
 				return fmt.Errorf("%w: %w", ErrCouldntReadConfigFile, err)
 			}
 
-			stacks, err := readConfig(homeDir, configBytes, stackNameRegex, tagRegex)
+			config, err := readConfig(homeDir, configBytes, stackNameRegex, tagRegex)
 			if err != nil {
 				return err
 			}
 
-			if len(stacks) == 0 {
-				return nil
+			if len(config.Stacks) == 0 {
+				return errNothingToCheck
 			}
 
 			cfClients := make(map[string]aws.CFClient)
 
 			seen := make(map[string]bool)
-			for _, stack := range stacks {
+			for _, stack := range config.Stacks {
 				configKey := stack.AWSConfigKey()
 				if seen[configKey] {
 					continue
@@ -154,7 +154,7 @@ with the state represented by their template files.`,
 					Open:     checkHTMLOpen,
 				}
 			}
-			return cli.ShowCheckResults(stacks,
+			return cli.ShowCheckResults(config,
 				cfClients,
 				compareWithCode,
 				checkDrift,
@@ -194,19 +194,19 @@ with the state represented by their template files.`,
 				return fmt.Errorf("%w: %w", ErrCouldntReadConfigFile, err)
 			}
 
-			stacks, err := readConfig(homeDir, configBytes, stackNameRegex, tagRegex)
+			config, err := readConfig(homeDir, configBytes, stackNameRegex, tagRegex)
 			if err != nil {
 				return err
 			}
 
-			if len(stacks) == 0 {
+			if len(config.Stacks) == 0 {
 				return nil
 			}
 
 			cfClients := make(map[string]aws.CFClient)
 
 			seen := make(map[string]bool)
-			for _, stack := range stacks {
+			for _, stack := range config.Stacks {
 				configKey := stack.AWSConfigKey()
 				if seen[configKey] {
 					continue
@@ -221,7 +221,7 @@ with the state represented by their template files.`,
 				}
 			}
 
-			return ui.RenderUI(stacks, cfClients)
+			return ui.RenderUI(config, cfClients)
 		},
 	}
 
@@ -304,6 +304,7 @@ with the state represented by their template files.`,
 	checkCmd.Flags().StringVar(&checkHTMLOutputTemplateFile, "html-template-file", "", "location of the template file to use for html output")
 	checkCmd.Flags().BoolVarP(&checkHTMLOpen, "html-open", "o", false, "open html output in browser instead of outputting to stdout")
 
+	tuiCmd.Flags().StringVarP(&configPath, "config-file", "c", defaultConfigPath, "location of outtasync's config file")
 	tuiCmd.Flags().StringVarP(&nameFilterStr, "name-filter", "n", "", "regex for name(s) (configured in outtasync's config) to filter stacks by")
 	tuiCmd.Flags().StringVarP(&tagsFilterStr, "tags-filter", "t", "", "regex for tag(s) to filter stacks by")
 

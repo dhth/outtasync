@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
+	"regexp"
 	"strings"
 
 	cf "github.com/aws/aws-sdk-go-v2/service/cloudformation"
@@ -48,20 +50,26 @@ func (cs ConfigSource) Display() string {
 	return value
 }
 
+type OuttasyncConfig struct {
+	Stacks            []StackConfig       `yaml:"stacks"`
+	RemoteCallHeaders []RemoteCallHeaders `yaml:"remote_call_headers,omitempty"`
+}
+
 type Config struct {
-	Stacks []StackConfig `yaml:"stacks"`
+	Stacks            []Stack
+	RemoteCallHeaders []RemoteCallHeaders
 }
 
 type StackConfig struct {
-	Name                      string                      `yaml:"name"`
-	ConfigSource              string                      `yaml:"config_source"`
-	Arn                       string                      `yaml:"arn"`
-	TemplatePath              *string                     `yaml:"template_path,omitempty"`
-	TemplateRemoteCallHeaders []TemplateRemoteCallHeaders `yaml:"template_remote_call_headers,omitempty"`
-	Tags                      []string                    `yaml:"tags,omitempty"`
+	Name              string              `yaml:"name"`
+	ConfigSource      string              `yaml:"config_source"`
+	Arn               string              `yaml:"arn"`
+	TemplatePath      *string             `yaml:"template_path,omitempty"`
+	RemoteCallHeaders []RemoteCallHeaders `yaml:"remote_call_headers,omitempty"`
+	Tags              []string            `yaml:"tags,omitempty"`
 }
 
-type TemplateRemoteCallHeaders struct {
+type RemoteCallHeaders struct {
 	Key   string `yaml:"key"`
 	Value string `yaml:"value"`
 }
@@ -75,7 +83,7 @@ type Stack struct {
 	Arn                       string
 	ConfigSource              ConfigSource
 	TemplatePath              *string
-	TemplateRemoteCallHeaders []TemplateRemoteCallHeaders
+	TemplateRemoteCallHeaders []RemoteCallHeaders
 	Tags                      []string
 }
 
@@ -129,7 +137,7 @@ func ParseConfigSource(value string) (ConfigSource, error) {
 		}
 		return ConfigSource{
 			SharedProfile,
-			value,
+			os.ExpandEnv(value),
 		}, nil
 	}
 
@@ -139,8 +147,8 @@ func ParseConfigSource(value string) (ConfigSource, error) {
 			return zero, errConfigSourceEmpty
 		}
 		return ConfigSource{
-			SharedProfile,
-			value,
+			AssumeRole,
+			os.ExpandEnv(value),
 		}, nil
 	}
 
@@ -153,7 +161,7 @@ func EncodeConfig(stacks []Stack) ([]byte, error) {
 		stackConfigs[i] = st.GetConfigRepr()
 	}
 
-	config := Config{
+	config := OuttasyncConfig{
 		Stacks: stackConfigs,
 	}
 
@@ -168,6 +176,42 @@ func EncodeConfig(stacks []Stack) ([]byte, error) {
 	}
 
 	return configBytes.Bytes(), nil
+}
+
+func ParseConfig(config OuttasyncConfig, homeDir string, stackNameRegex, tagRegex *regexp.Regexp) (Config, []string) {
+	var errors []string
+	// nolint:prealloc
+	var stacks []Stack
+
+	for i, stackConfig := range config.Stacks {
+		stack, errs := ParseStackConfig(stackConfig, homeDir)
+		if len(errs) > 0 {
+			errors = append(errors, fmt.Sprintf("- invalid config for stack at index %d: %v", i, errs))
+			continue
+		}
+		if stackNameRegex != nil && !stackNameRegex.Match([]byte(stack.Name)) {
+			continue
+		}
+
+		if tagRegex != nil {
+			tagMatch := false
+			for _, tag := range stack.Tags {
+				if tagRegex.Match([]byte(tag)) {
+					tagMatch = true
+					break
+				}
+			}
+			if !tagMatch {
+				continue
+			}
+		}
+		stacks = append(stacks, stack)
+	}
+
+	return Config{
+		Stacks:            stacks,
+		RemoteCallHeaders: config.RemoteCallHeaders,
+	}, errors
 }
 
 func ParseStackConfig(config StackConfig, homeDir string) (Stack, []error) {
@@ -194,7 +238,7 @@ func ParseStackConfig(config StackConfig, homeDir string) (Stack, []error) {
 		Arn:                       config.Arn,
 		ConfigSource:              configSource,
 		TemplatePath:              local,
-		TemplateRemoteCallHeaders: config.TemplateRemoteCallHeaders,
+		TemplateRemoteCallHeaders: config.RemoteCallHeaders,
 		Tags:                      config.Tags,
 	}, nil
 }

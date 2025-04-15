@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/dhth/outtasync/internal/aws"
+	"github.com/dhth/outtasync/internal/types"
 )
 
 type pane uint
@@ -39,6 +40,7 @@ type Model struct {
 	showHelp                bool
 	throttledCmds           []tea.Cmd
 	throttledCmdsInProgress int
+	remoteCallHeaders       []types.RemoteCallHeaders
 }
 
 func (m Model) Init() tea.Cmd {

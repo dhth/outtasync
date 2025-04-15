@@ -27,7 +27,7 @@ type result struct {
 }
 
 func ShowCheckResults(
-	stacks []types.Stack,
+	config types.Config,
 	cfClients map[string]aws.CFClient,
 	checkTemplate, checkDrift, showProgressIndicator bool,
 	format types.CheckOutputFormat,
@@ -41,7 +41,7 @@ func ShowCheckResults(
 	totalCompareChecks := 0
 	var stacksToCheck []types.Stack
 
-	for _, stack := range stacks {
+	for _, stack := range config.Stacks {
 		cfgKey := stack.AWSConfigKey()
 		_, ok := cfClients[cfgKey]
 		if !ok {
@@ -99,11 +99,12 @@ func ShowCheckResults(
 				defer func() {
 					<-syncSemaphore
 				}()
+				remoteCallHeaders := append(config.RemoteCallHeaders, stack.TemplateRemoteCallHeaders...)
 				syncResultChannel <- aws.CompareStackTemplateCode(cfClient,
 					stack.Name,
 					stack.Key(),
 					*stack.TemplatePath,
-					stack.TemplateRemoteCallHeaders,
+					remoteCallHeaders,
 					computeDiff)
 				if showProgressIndicator {
 					templateChan <- struct{}{}

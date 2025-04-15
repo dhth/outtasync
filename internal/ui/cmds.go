@@ -107,7 +107,7 @@ func getCFTemplateBody(
 	stackName,
 	stackKey,
 	templatePath string,
-	remoteCallHeaders []types.TemplateRemoteCallHeaders,
+	remoteCallHeaders []types.RemoteCallHeaders,
 	throttled bool,
 ) tea.Cmd {
 	return func() tea.Msg {

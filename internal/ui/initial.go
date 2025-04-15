@@ -8,10 +8,10 @@ import (
 	"github.com/dhth/outtasync/internal/types"
 )
 
-func InitialModel(stacks []types.Stack, cfClients map[string]aws.CFClient) Model {
-	stackItems := make([]list.Item, len(stacks))
+func InitialModel(config types.Config, cfClients map[string]aws.CFClient) Model {
+	stackItems := make([]list.Item, len(config.Stacks))
 
-	for i, stack := range stacks {
+	for i, stack := range config.Stacks {
 		si := stackItem{
 			stack: stack,
 		}
@@ -28,6 +28,7 @@ func InitialModel(stacks []types.Stack, cfClients map[string]aws.CFClient) Model
 		erroredStacksList:      list.New(make([]list.Item, 0), newAppItemDelegate(lipgloss.Color(errorColor)), 0, 0),
 		showHelp:               true,
 		throttledCmds:          networkCallCmds,
+		remoteCallHeaders:      config.RemoteCallHeaders,
 	}
 
 	m.stacksList.Title = "Stacks"

@@ -17,7 +17,7 @@ const stackSyncCheckTimeoutSecs = 5
 func CompareStackTemplateCode(
 	cfClient CFClient,
 	stackName, stackKey, templatePath string,
-	remoteCallHeaders []types.TemplateRemoteCallHeaders,
+	remoteCallHeaders []types.RemoteCallHeaders,
 	computeDiff bool,
 ) types.TemplateCheckResult {
 	if cfClient.Err != nil {

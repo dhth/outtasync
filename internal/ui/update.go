@@ -300,7 +300,15 @@ func (m *Model) getCmdForTemplateCheck() (tea.Cmd, bool) {
 	si.syncCheckStatus = syncStatusInProgress
 	si.syncErr = nil
 	m.stacksList.SetItem(index, si)
-	return getCFTemplateBody(m.cfClients[si.stack.AWSConfigKey()], index, si.stack.Name, si.stack.Key(), *si.stack.TemplatePath, si.stack.TemplateRemoteCallHeaders, false), true
+	remoteCallHeaders := append(m.remoteCallHeaders, si.stack.TemplateRemoteCallHeaders...)
+	return getCFTemplateBody(
+		m.cfClients[si.stack.AWSConfigKey()],
+		index,
+		si.stack.Name,
+		si.stack.Key(),
+		*si.stack.TemplatePath,
+		remoteCallHeaders,
+		false), true
 }
 
 func (m *Model) getCmdsForTemplateCheck() []tea.Cmd {
@@ -324,7 +332,15 @@ func (m *Model) getCmdsForTemplateCheck() []tea.Cmd {
 		si.syncErr = nil
 		si.syncCheckStatus = syncStatusInProgress
 		m.stacksList.SetItem(i, si)
-		cmds = append(cmds, getCFTemplateBody(m.cfClients[si.stack.AWSConfigKey()], i, si.stack.Name, si.stack.Key(), *si.stack.TemplatePath, si.stack.TemplateRemoteCallHeaders, true))
+		remoteCallHeaders := append(m.remoteCallHeaders, si.stack.TemplateRemoteCallHeaders...)
+		cmds = append(cmds, getCFTemplateBody(
+			m.cfClients[si.stack.AWSConfigKey()],
+			i,
+			si.stack.Name,
+			si.stack.Key(),
+			*si.stack.TemplatePath,
+			remoteCallHeaders,
+			true))
 	}
 
 	return cmds
