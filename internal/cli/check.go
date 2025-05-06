@@ -177,9 +177,17 @@ func ShowCheckResults(
 	switch format {
 	case types.Default:
 		report := getDefaultReport(results, stacksToCheck, checkTemplate, checkDrift, listNegativesOnly)
+		if report == "" {
+			return nil
+		}
+
 		fmt.Println(report)
 	case types.Delimited:
 		report := getDelimitedReport(results, stacksToCheck, checkTemplate, checkDrift, listNegativesOnly)
+		if report == "" {
+			return nil
+		}
+
 		fmt.Println(report)
 	case types.HTML:
 		report, err := getHTMLReport(results, stacksToCheck, checkTemplate, checkDrift, listNegativesOnly, htmlOutputConfig)
@@ -192,7 +200,7 @@ func ShowCheckResults(
 				return fmt.Errorf("%w: %w", errCouldntOpenHTMLOutput, err)
 			}
 		} else {
-			fmt.Println(report)
+			fmt.Print(report)
 		}
 	}
 

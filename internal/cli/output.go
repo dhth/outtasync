@@ -29,7 +29,8 @@ func getDefaultReport(
 	listNegativesOnly bool,
 ) string {
 	var errors []string
-	rows := make([][]string, len(stacks))
+	//nolint:prealloc
+	var rows [][]string
 	for i, stack := range stacks {
 		result, ok := results[stack.Key()]
 		var row []string
@@ -52,7 +53,7 @@ func getDefaultReport(
 				}
 			}
 			row[i] = stackErrorResultStyle.Render(row[0])
-			rows[i] = row
+			rows = append(rows, row)
 
 			continue
 		}
@@ -116,7 +117,7 @@ func getDefaultReport(
 			row[0] = stackPositiveResultStyle.Render(row[0])
 		}
 
-		rows[i] = row
+		rows = append(rows, row)
 	}
 
 	if len(rows) == 0 {
@@ -175,8 +176,9 @@ func getDelimitedReport(
 	showDriftResults bool,
 	listNegativesOnly bool,
 ) string {
-	rows := make([][]string, len(stacks))
-	for i, stack := range stacks {
+	//nolint:prealloc
+	var rows [][]string
+	for _, stack := range stacks {
 		result, ok := results[stack.Key()]
 		var row []string
 		row = append(row, stack.Name)
@@ -187,7 +189,7 @@ func getDelimitedReport(
 			if showDriftResults {
 				row = append(row, err)
 			}
-			rows[i] = row
+			rows = append(rows, row)
 			continue
 		}
 
@@ -237,7 +239,7 @@ func getDelimitedReport(
 			continue
 		}
 
-		rows[i] = row
+		rows = append(rows, row)
 	}
 
 	if len(rows) == 0 {
@@ -270,8 +272,9 @@ func getHTMLReport(
 ) (string, error) {
 	var errors []string
 	var diffs []HTMLDiff
-	rows := make([]HTMLDataRow, len(stacks))
-	for i, stack := range stacks {
+	//nolint:prealloc
+	var rows []HTMLDataRow
+	for _, stack := range stacks {
 		result, ok := results[stack.Key()]
 		row := HTMLDataRow{StackName: stack.Name}
 
@@ -295,7 +298,7 @@ func getHTMLReport(
 					row.HasError = true
 				}
 			}
-			rows[i] = row
+			rows = append(rows, row)
 			continue
 		}
 
@@ -364,7 +367,7 @@ func getHTMLReport(
 			continue
 		}
 
-		rows[i] = row
+		rows = append(rows, row)
 	}
 
 	var title string
