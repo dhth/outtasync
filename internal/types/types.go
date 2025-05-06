@@ -225,10 +225,11 @@ func ParseStackConfig(config StackConfig, homeDir string) (Stack, []error) {
 
 	var templatePath *string
 	if config.TemplatePath != nil {
-		if strings.HasPrefix(*config.TemplatePath, "https://") {
-			templatePath = config.TemplatePath
+		templatePathExpanded := os.ExpandEnv(*config.TemplatePath)
+		if strings.HasPrefix(templatePathExpanded, "https://") {
+			templatePath = &templatePathExpanded
 		} else {
-			l := utils.ExpandTilde(*config.TemplatePath, homeDir)
+			l := utils.ExpandTilde(templatePathExpanded, homeDir)
 			templatePath = &l
 		}
 	}
