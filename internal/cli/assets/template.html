@@ -12,78 +12,84 @@
     <script>hljs.highlightAll();</script>
 </head>
 <body class="bg-[#282828] text-[#f2e5bc]">
-    <div class="mx-auto p-4 mt-8 w-4/5">
-        <h1 class="text-[#fabd2f] text-3xl mb-4 font-bold">{{.Title}}</h1>
-        <p class="text-[#928374] italic">Generated at {{.Timestamp}}</p>
-        <table class="table-auto text-right mt-8 text-xl">
-            <thead>
-                <tr class="text-[#fbf1c7] bg-[#3c3836] border-2 border-[#3c3836] border-opacity-50">
-                    <th class="px-10 py-2">Stack</th>
-                    {{if .ShowTemplateResults}}
-                    <th class="px-10 py-2 font-bold ">Template in sync</th>
-                    {{end -}}
-                    {{if .ShowDriftResults}}
-                    <th class="px-10 py-2 font-bold ">No drift</th>
-                    {{end -}}
-                </tr>
-            </thead>
-            <tbody>
-                {{range .Rows -}}
-                <tr class="border-2 border-[#3c3836] border-opacity-50 font-semibold">
-                    {{if .HasNegativeResult}}
-                    <td class="px-10 py-2 text-[#fb4934]">{{.StackName}}</td>
-                    {{else if .HasError}}
-                    <td class="px-10 py-2 text-[#928374]">{{.StackName}}</td>
-                    {{else}}
-                    <td class="px-10 py-2 text-[#b8bb26]">{{.StackName}}</td>
-                    {{end -}}
-                    {{if $.ShowTemplateResults}}
-                        {{if .TemplateCheckErrored}}
-                        <td class="px-10 py-2 text-[#928374]">{{.TemplateCheckValue}}</td>
-                        {{else if .TemplateInSync}}
-                        <td class="px-10 py-2 text-[#b8bb26]">{{.TemplateCheckValue}}</td>
-                        {{else}}
-                        <td class="px-10 py-2 text-[#fb4934]">{{.TemplateCheckValue}}</td>
+    <div class="mx-auto max-sm:w-full max-sm:px-4 min-h-screen pt-8 w-4/5">
+        <h1 class="text-[#fabd2f] text-3xl font-semibold">{{.Title}}</h1>
+        <p class="text-[#928374] italic mt-4">Generated at {{.Timestamp}}</p>
+        <div class="mt-2 overflow-x-scroll">
+            <table class="table-auto text-right max-sm:text-xs font-semibold whitespace-nowrap">
+                <thead>
+                    <tr class="text-[#fbf1c7] bg-[#3c3836] border-2 border-[#3c3836] border-opacity-50">
+                        <th class="px-10 py-2">Stack</th>
+                        {{if .ShowTemplateResults}}
+                        <th class="px-10 py-2">Template in sync</th>
                         {{end -}}
-                    {{end -}}
-                    {{if $.ShowDriftResults}}
-                        {{if .DriftCheckError}}
-                        <td class="px-10 py-2 text-[#928374]">{{.DriftCheckValue}}</td>
-                        {{else if .NoDrift}}
-                        <td class="px-10 py-2 text-[#b8bb26]">{{.DriftCheckValue}}</td>
-                        {{else}}
-                        <td class="px-10 py-2 text-[#fb4934]">{{.DriftCheckValue}}</td>
+                        {{if .ShowDriftResults}}
+                        <th class="px-10 py-2">No drift</th>
                         {{end -}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Rows -}}
+                    <tr class="border-2 border-[#3c3836] border-opacity-50 font-semibold">
+                        {{if .HasNegativeResult}}
+                        <td class="px-10 py-2 text-[#fb4934]">{{.StackName}}</td>
+                        {{else if .HasError}}
+                        <td class="px-10 py-2 text-[#928374]">{{.StackName}}</td>
+                        {{else}}
+                        <td class="px-10 py-2 text-[#b8bb26]">{{.StackName}}</td>
+                        {{end -}}
+                        {{if $.ShowTemplateResults}}
+                            {{if .TemplateCheckErrored}}
+                            <td class="px-10 py-2 text-[#928374]">{{.TemplateCheckValue}}</td>
+                            {{else if .TemplateInSync}}
+                            <td class="px-10 py-2 text-[#b8bb26]">{{.TemplateCheckValue}}</td>
+                            {{else}}
+                            <td class="px-10 py-2 text-[#fb4934]">{{.TemplateCheckValue}}</td>
+                            {{end -}}
+                        {{end -}}
+                        {{if $.ShowDriftResults}}
+                            {{if .DriftCheckError}}
+                            <td class="px-10 py-2 text-[#928374]">{{.DriftCheckValue}}</td>
+                            {{else if .NoDrift}}
+                            <td class="px-10 py-2 text-[#b8bb26]">{{.DriftCheckValue}}</td>
+                            {{else}}
+                            <td class="px-10 py-2 text-[#fb4934]">{{.DriftCheckValue}}</td>
+                            {{end -}}
+                        {{end -}}
+                    </tr>
                     {{end -}}
-                </tr>
-                {{end -}}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
 
         {{if .Diffs }}
-        <h2 class="text-xl text-[#fb4934] font-bold mt-10 flex justify-left items-center">
-            Diffs
-            <button 
-                class="bg-[#1d2021] text-[#928374] text-xs ml-4 px-4 py-2 hover:bg-[#83a598] hover:text-[#282828] focus:outline-none cursor-pointer" 
-                onclick="toggleAllDetails()">
-                Toggle All
-            </button>
-        </h2>
-        {{range .Diffs -}}
-        <div class="my-2 overflow-x-auto">
-            <details>
-                <summary class="text-[#83a598] cursor-pointer">{{.StackName}}</summary>
-                <pre class="mt-2"><code class="language-diff bg-[#1d2021] text-sm">{{.Diff}}</code></pre>
-            </details>
+        <div>
+            <h2 class="text-xl text-[#fb4934] font-bold mt-10 flex justify-left items-center">
+                Diffs
+                <button 
+                    class="bg-[#1d2021] text-[#928374] text-xs ml-4 px-4 py-2 hover:bg-[#83a598] hover:text-[#282828] focus:outline-none cursor-pointer" 
+                    onclick="toggleAllDetails()">
+                    Toggle All
+                </button>
+            </h2>
+            {{range .Diffs -}}
+            <div class="my-2 overflow-x-scroll">
+                <details>
+                    <summary class="text-[#83a598] cursor-pointer">{{.StackName}}</summary>
+                    <pre class="mt-2"><code class="language-diff bg-[#1d2021] text-sm">{{.Diff}}</code></pre>
+                </details>
+            </div>
+            {{end -}}
         </div>
-        {{end -}}
         {{end -}}
 
         {{if .Errors }}
-        <h2 class="text-xl text-[#928374] font-bold mt-10 mb-4">Errors</h2>
-        {{range $error := .Errors -}}
-        <p class="text-[#bdae93]">{{$error}}</p>
-        {{end -}}
+        <div class="overflow-x-scroll">
+        <p class="text-[#fb4934] text-lg font-bold mt-8">Errors</p>
+            {{range $i, $error := .Errors -}}
+            <p class="text-[#bdae93] mt-2 text-sm">[{{$i}}]: {{$error}}</p>
+            {{end -}}
+        </div>
         {{end -}}
 
         <p class="text-[#928374] italic my-10 border-[#928374] border-t-2 pt-2 border-opacity-20">Built using <a class="font-bold" href="https://github.com/dhth/outtasync" target="_blank">outtasync</a></p>
