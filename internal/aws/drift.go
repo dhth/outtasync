@@ -3,15 +3,25 @@ package aws
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
+	"github.com/dhth/outtasync/internal/constants"
 	"github.com/dhth/outtasync/internal/types"
 
 	cf "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	cftypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 )
 
-const driftCheckTimeoutSecs = 15
+const (
+	driftCheckTimeoutSecs = 15
+	driftCheckMaxAttempts = 5
+)
+
+var (
+	errDriftDetectionTimedOut = errors.New("drift detection timed out")
+	errDriftDetectionFailed   = errors.New("drift detection failed")
+)
 
 func CheckStackDriftStatus(
 	cfClient CFClient,
@@ -54,18 +64,33 @@ func CheckStackDriftStatus(
 			}
 		}
 
-		if descOutput.DetectionStatus != cftypes.StackDriftDetectionStatusDetectionInProgress {
+		switch descOutput.DetectionStatus {
+		case cftypes.StackDriftDetectionStatusDetectionComplete:
 			return types.StackDriftCheckResult{
 				Stack:  stack,
 				Output: descOutput,
-				Err:    err,
 			}
+		case cftypes.StackDriftDetectionStatusDetectionFailed:
+			if descOutput.DetectionStatusReason != nil {
+				return types.StackDriftCheckResult{
+					Stack: stack,
+					Err:   fmt.Errorf("%w; reason: %s", errDriftDetectionFailed, *descOutput.DetectionStatusReason),
+				}
+			}
+			return types.StackDriftCheckResult{
+				Stack: stack,
+				Err:   errDriftDetectionFailed,
+			}
+		default:
+			time.Sleep(time.Millisecond * describeDriftSleepMillis)
 		}
-		time.Sleep(time.Millisecond * describeDriftSleepMillis)
 	}
 
 	return types.StackDriftCheckResult{
 		Stack: stack,
-		Err:   errors.New("couldn't fetch drift status"),
+		Err: fmt.Errorf("%w; if you think the deadline for this check should be higher, let %s know via %s",
+			errDriftDetectionTimedOut,
+			constants.Author,
+			constants.RepoIssuesURL),
 	}
 }

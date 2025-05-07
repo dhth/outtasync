@@ -6,9 +6,8 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/dhth/outtasync/internal/utils"
-
-	cftypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 )
 
 const (
@@ -151,13 +150,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 `, errorDetailsHeadingStyle.Render("Drift Check Error"), si.driftErr.Error())
 				}
 
-				m.stackErrorVP.SetContent(errorDetails)
+				// TODO: not sure why the viewport is not wrapping content by default
+				// this is a workaround for that
+				m.stackErrorVP.SetContent(lipgloss.NewStyle().Width(m.terminalWidth - 4).Render(errorDetails))
 				m.activePane = errorDetailsPane
 			case errorDetailsPane:
 				m.activePane = stacksList
 			}
 		}
 	case tea.WindowSizeMsg:
+		m.terminalWidth = msg.Width
+		m.terminalHeight = msg.Height
 		w, h := stackListStyle.GetFrameSize()
 		m.stacksList.SetWidth(msg.Width - w - 2)
 		m.stacksList.SetHeight(msg.Height - h - 2)
@@ -191,19 +194,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		si.driftErr = msg.result.Err
 		si.driftOutput = msg.result.Output
-
-		if msg.result.Err == nil {
-			var status driftCheckStatus
-			switch msg.result.Output.DetectionStatus {
-			case cftypes.StackDriftDetectionStatusDetectionComplete:
-				status = driftChecked
-			case cftypes.StackDriftDetectionStatusDetectionFailed:
-				status = driftCheckFailed
-			case cftypes.StackDriftDetectionStatusDetectionInProgress:
-				status = driftCheckInProgress
-			}
-			si.driftCheckStatus = status
-		}
+		si.driftCheckStatus = driftChecked
 		m.stacksList.SetItem(msg.index, si)
 		m.recomputeStats()
 		if msg.throttled && m.throttledCmdsInProgress > 0 {

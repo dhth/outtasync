@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	driftCheckMaxAttempts    = 5
 	describeDriftSleepMillis = 3000
 )
 

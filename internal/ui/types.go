@@ -24,7 +24,6 @@ const (
 	driftNotChecked driftCheckStatus = iota
 	driftCheckInProgress
 	driftChecked
-	driftCheckFailed
 )
 
 const (
@@ -73,8 +72,6 @@ func (si stackItem) Title() string {
 		driftStatus = errorStyle.Render("error")
 	} else {
 		switch si.driftCheckStatus {
-		case driftCheckFailed:
-			driftStatus = driftErrorStyle.Render("error")
 		case driftCheckInProgress:
 			driftStatus = driftCheckInProgressStyle.Render("...")
 		case driftChecked:

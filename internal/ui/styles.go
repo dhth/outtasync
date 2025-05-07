@@ -69,9 +69,6 @@ var (
 	driftReasonStyle = statusStyle.
 				Foreground(lipgloss.Color(driftReasonColor))
 
-	driftErrorStyle = statusStyle.
-			Background(lipgloss.Color(errorColor))
-
 	msgStyle = lipgloss.NewStyle().
 			PaddingLeft(2).
 			Bold(true)

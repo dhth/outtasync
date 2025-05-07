@@ -41,6 +41,8 @@ type Model struct {
 	throttledCmds           []tea.Cmd
 	throttledCmdsInProgress int
 	remoteCallHeaders       []types.RemoteCallHeaders
+	terminalWidth           int
+	terminalHeight          int
 }
 
 func (m Model) Init() tea.Cmd {
