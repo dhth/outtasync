@@ -25,9 +25,9 @@ tab/<S-tab>        move between filter states
 1                  filter for stacks with code mismatch
 2                  filter for stacks that've drifted
 3                  filter for stacks with errors
-s                  check template's sync status for stack under cursor
-S                  check template's sync status for all stacks
+s                  check template sync status for stack under cursor (unwhen unfiltered)
+S                  check template sync status for all stacks (unwhen unfiltered)
 <ctrl+s>           show sync check results (requires git to be available in PATH)
-d                  check template's drift status
-D                  check template's drift status for all stacks
+d                  check drift status for stack under cursor (unwhen unfiltered)
+D                  check drift status for all stacks (unwhen unfiltered)
 e                  show error details (if present)
