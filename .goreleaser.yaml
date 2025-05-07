@@ -36,7 +36,7 @@ brews:
     directory: Formula
     license: MIT
     homepage: "https://github.com/dhth/outtasync"
-    description: "identify CloudFormation stacks that have gone out of sync with their counterpart stack files"
+    description: "Identify Cloudformation stacks that have drifted or gone out of sync"
 
 changelog:
   sort: asc
