@@ -21,6 +21,17 @@ const (
 var (
 	errConfigSourceEmpty     = errors.New("config source is empty")
 	errIncorrectConfigSource = errors.New("incorrect config source provided")
+	errStackNameIsEmpty      = errors.New("stack name is empty")
+	errStackNameIsInvalid    = errors.New("stack name is invalid")
+	errStackArnIsEmpty       = errors.New("stack ARN is empty")
+	errStackArnIsInvalid     = errors.New("stack ARN is invalid")
+	errHeaderKeyIsEmpty      = errors.New("header key is empty")
+	errHeaderValueIsEmpty    = errors.New("header value is empty")
+)
+
+var (
+	cloudformationStackNameRegex = regexp.MustCompile("^[a-zA-Z0-9-]+$")
+	cloudformationArnRegex       = regexp.MustCompile(`^arn:aws:cloudformation:[a-z0-9-]+:\d{12}:stack\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+$`)
 )
 
 type ConfigSourceKind uint
@@ -74,8 +85,46 @@ type RemoteCallHeaders struct {
 	Value string `yaml:"value"`
 }
 
+func (h RemoteCallHeaders) validate() []error {
+	var errors []error
+
+	if strings.TrimSpace(h.Key) == "" {
+		errors = append(errors, errHeaderKeyIsEmpty)
+	}
+
+	if strings.TrimSpace(h.Value) == "" {
+		errors = append(errors, errHeaderValueIsEmpty)
+	}
+
+	return errors
+}
+
 func (sc StackConfig) getConfigSource() (ConfigSource, error) {
 	return ParseConfigSource(sc.ConfigSource)
+}
+
+func (sc StackConfig) validateName() error {
+	if strings.TrimSpace(sc.Name) == "" {
+		return errStackNameIsEmpty
+	}
+
+	if !cloudformationStackNameRegex.Match([]byte(sc.Name)) {
+		return errStackNameIsInvalid
+	}
+
+	return nil
+}
+
+func (sc StackConfig) validateArn() error {
+	if strings.TrimSpace(sc.Arn) == "" {
+		return errStackArnIsEmpty
+	}
+
+	if !cloudformationArnRegex.Match([]byte(sc.Arn)) {
+		return errStackArnIsInvalid
+	}
+
+	return nil
 }
 
 type Stack struct {
@@ -183,10 +232,24 @@ func ParseConfig(config OuttasyncConfig, homeDir string, stackNameRegex, tagRege
 	// nolint:prealloc
 	var stacks []Stack
 
+	for i, headers := range config.RemoteCallHeaders {
+		if errs := headers.validate(); len(errs) > 0 {
+			errStrs := make([]string, len(errs))
+			for j, err := range errs {
+				errStrs[j] = err.Error()
+			}
+			errors = append(errors, fmt.Sprintf("- global remote call headers at index %d are incorrect (%s)", i, strings.Join(errStrs, ", ")))
+		}
+	}
+
 	for i, stackConfig := range config.Stacks {
 		stack, errs := ParseStackConfig(stackConfig, homeDir)
 		if len(errs) > 0 {
-			errors = append(errors, fmt.Sprintf("- invalid config for stack at index %d: %v", i, errs))
+			errStrs := make([]string, len(errs))
+			for i, err := range errs {
+				errStrs[i] = err.Error()
+			}
+			errors = append(errors, fmt.Sprintf("- invalid config for stack at index %d: %s", i, strings.Join(errStrs, ", ")))
 			continue
 		}
 		if stackNameRegex != nil && !stackNameRegex.Match([]byte(stack.Name)) {
@@ -218,8 +281,16 @@ func ParseStackConfig(config StackConfig, homeDir string) (Stack, []error) {
 	var errors []error
 	var zero Stack
 
+	if err := config.validateName(); err != nil {
+		errors = append(errors, err)
+	}
+
 	configSource, err := config.getConfigSource()
 	if err != nil {
+		errors = append(errors, err)
+	}
+
+	if err := config.validateArn(); err != nil {
 		errors = append(errors, err)
 	}
 
@@ -231,6 +302,16 @@ func ParseStackConfig(config StackConfig, homeDir string) (Stack, []error) {
 		} else {
 			l := utils.ExpandTilde(templatePathExpanded, homeDir)
 			templatePath = &l
+		}
+	}
+
+	for i, headers := range config.RemoteCallHeaders {
+		if errs := headers.validate(); len(errs) > 0 {
+			errStrs := make([]string, len(errs))
+			for j, err := range errs {
+				errStrs[j] = err.Error()
+			}
+			errors = append(errors, fmt.Errorf("remote call headers at index %d are incorrect (%s)", i, strings.Join(errStrs, ", ")))
 		}
 	}
 

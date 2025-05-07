@@ -279,6 +279,31 @@ with the state represented by their template files.`,
 		},
 	}
 
+	validateConfigCmd := &cobra.Command{
+		Use:          "validate",
+		Short:        "validate config",
+		SilenceUsage: true,
+		RunE: func(_ *cobra.Command, _ []string) error {
+			configPathFull = utils.ExpandTilde(configPath, homeDir)
+			configBytes, err := os.ReadFile(configPathFull)
+			if err != nil {
+				return fmt.Errorf("%w: %w", ErrCouldntReadConfigFile, err)
+			}
+
+			config, err := readConfig(homeDir, configBytes, nil, nil)
+			if err != nil {
+				return err
+			}
+
+			if len(config.Stacks) == 0 {
+				return errNothingToCheck
+			}
+
+			fmt.Println("config looks good ✅")
+			return nil
+		},
+	}
+
 	var err error
 	homeDir, err = os.UserHomeDir()
 	if err != nil {
@@ -312,7 +337,10 @@ with the state represented by their template files.`,
 	generateConfigCmd.Flags().StringVarP(&genConfigFilterStr, "name-filter", "n", "", "regex for name(s) to filter stacks by")
 	generateConfigCmd.Flags().StringVarP(&genConfigTags, "tags", "t", "", "comma separated list of tags to use")
 
+	validateConfigCmd.Flags().StringVarP(&configPath, "config-file", "c", defaultConfigPath, "location of outtasync's config file")
+
 	configCmd.AddCommand(generateConfigCmd)
+	configCmd.AddCommand(validateConfigCmd)
 
 	rootCmd.AddCommand(checkCmd)
 	rootCmd.AddCommand(configCmd)
