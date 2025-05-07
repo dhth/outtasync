@@ -13,6 +13,11 @@ import (
 	"github.com/dhth/outtasync/internal/types"
 )
 
+const (
+	maxSyncChecksAtATime  = 10
+	maxDriftChecksAtATime = 3
+)
+
 var (
 	errUnsupportedPlatformForHTMLOpen = errors.New("opening HTML output is not supported on this platform")
 	errCouldntGenerateHTMLOutput      = errors.New("couldn't generate HTML output")
@@ -65,8 +70,8 @@ func ShowCheckResults(
 		go showLoadingSpinner(done, templateChan, driftChan, checkTemplate, checkDrift, totalCompareChecks, len(stacksToCheck))
 	}
 
-	syncSemaphore := make(chan struct{}, 10)
-	driftSemaphore := make(chan struct{}, 3)
+	syncSemaphore := make(chan struct{}, maxSyncChecksAtATime)
+	driftSemaphore := make(chan struct{}, maxDriftChecksAtATime)
 	syncResultChannel := make(chan types.TemplateCheckResult)
 	var syncWg sync.WaitGroup
 	driftResultChan := make(chan types.StackDriftCheckResult)
