@@ -4,37 +4,37 @@ import (
 	"time"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/dhth/outtasync/internal/aws"
-)
-
-type stateView uint
-
-const (
-	cfStacksList stateView = iota
-)
-
-type stackFilter uint
-
-const (
-	stacksFilterAll stackFilter = iota
-	stacksFilterErr
-	stacksFilterOuttaSync
-	stacksFilterInSync
+	"github.com/dhth/outtasync/internal/types"
 )
 
 type Model struct {
-	awsConfigs        map[string]aws.Config
-	state             stateView
-	stacksList        list.Model
-	stacksListReserve map[string]stackItem
-	stacksFilter      stackFilter
-	checkOnStart      bool
-	message           string
-	errorMessage      string
-	outtaSyncNum      uint
-	errorNum          uint
-	showHelp          bool
+	cfClients               map[string]aws.CFClient
+	activePane              pane
+	lastPane                pane
+	stacksList              list.Model
+	codeMismatchStacksList  list.Model
+	driftedStacksList       list.Model
+	erroredStacksList       list.Model
+	resultVP                viewport.Model
+	resultVPReady           bool
+	stackErrorVP            viewport.Model
+	stackErrorVPReady       bool
+	message                 string
+	errorMessage            string
+	outtaSyncNum            uint
+	errorNum                uint
+	driftedNum              uint
+	showHelp                bool
+	throttledCmds           []tea.Cmd
+	throttledCmdsInProgress int
+	remoteCallHeaders       []types.RemoteCallHeaders
+	helpVP                  viewport.Model
+	helpVPReady             bool
+	terminalWidth           int
+	terminalHeight          int
 }
 
 func (m Model) Init() tea.Cmd {
@@ -42,12 +42,5 @@ func (m Model) Init() tea.Cmd {
 
 	cmds = append(cmds, hideHelp(time.Minute*1))
 
-	if m.checkOnStart {
-		for i, stack := range m.stacksList.Items() {
-			if st, ok := stack.(stackItem); ok {
-				cmds = append(cmds, StackChosen(i, st))
-			}
-		}
-	}
 	return tea.Batch(cmds...)
 }

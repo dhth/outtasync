@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/base16/gruvbox-dark-medium.min.css">
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAgRJREFUOE9dk89LVFEUxz/njTIZlKvRhCEXktYuWkwt6r+INi6aWkVpuJowWkU/IAimlDZFuQmE/oFJ10USRLgUSqmFaAZhSBhv3olzz7tvXr7NzL33nO8553u+X+ksTSgo9omAqoD4GRVEFLWjPaKICmrvCnYjnaVxDYmeEi7j/3gOWGVgi8tBpbM8YZiGbVGOkFe3qACYI4YmDhboLI9bdlHfgv7sw8cV+P5NyLrC8EhG45wyeMTw8xFiRgCIZVX5tQvz7Qo/d7wr7w4OHYap6Yx63e8sJ0QYQLnNhQXh86eE+nGl2VTSVHn1ImFrG8bG4OaMpRW8O0Ckr5sqt1oJaQqTk0qjobYI3r8T3iw6AQ8eZQwM5ETYwozESN6PHeH+XQkMX59WTgRs4esX5Wk7CYO2bisjx3xqG8Y7yFe0vQUP71VCi9duKKdOOsDGBrQfG3kwe0cZruW02c/bfAQL3f8Ls62ErAsXLynnL/h0q6vw8nlCX5+PUO13rVinQUi93cOz+QprazA0BFeuZlT6lcXXCevrwukzGZebroRcl86Br8W/zU2Ye5Kwt9fThiXUasLUTJfBoz0Cg5xDB85I8fJ7F1Y+GFiCJMroqNI4q1SrJbH3pNxbY2GqQj4HneE1ypJ2IcUhcpcVriqsVQLyxRSO+1+J5YLRVJGKaO3AfvSD8A9SdvOUv9zHoQAAAABJRU5ErkJggg==" type="image/png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/diff.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: "Open Sans", sans-serif;
+        }
+        .language-diff {
+            font-family: "Fira Mono", monospace;
+        }
+    </style>
+</head>
+<body class="bg-[#282828] text-[#f2e5bc]">
+    <div class="mx-auto max-sm:w-full max-sm:px-4 min-h-screen pt-8 w-2/3">
+        <h1 class="text-[#fabd2f] text-3xl font-semibold">{{.Title}}</h1>
+        <p class="text-[#928374] italic mt-4">Generated at {{.Timestamp}}</p>
+        <div class="mt-2 overflow-x-auto">
+            <table class="table-auto text-right max-sm:text-xs font-semibold whitespace-nowrap">
+                <thead>
+                    <tr class="text-[#fbf1c7] bg-[#3c3836] border-2 border-[#3c3836] border-opacity-50">
+                        <th class="px-10 py-2">Stack</th>
+                        {{if .ShowTemplateResults}}
+                        <th class="px-10 py-2">Template in sync</th>
+                        {{end -}}
+                        {{if .ShowDriftResults}}
+                        <th class="px-10 py-2">No drift</th>
+                        {{end -}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Rows -}}
+                    <tr class="border-2 border-[#3c3836] border-opacity-50 font-semibold">
+                        {{if .HasNegativeResult}}
+                        <td class="px-10 py-2 text-[#fb4934]">{{.StackName}}</td>
+                        {{else if .HasError}}
+                        <td class="px-10 py-2 text-[#928374]">{{.StackName}}</td>
+                        {{else}}
+                        <td class="px-10 py-2 text-[#b8bb26]">{{.StackName}}</td>
+                        {{end -}}
+                        {{if $.ShowTemplateResults}}
+                            {{if .TemplateCheckErrored}}
+                            <td class="px-10 py-2 text-[#928374]">{{.TemplateCheckValue}}</td>
+                            {{else if .TemplateInSync}}
+                            <td class="px-10 py-2 text-[#b8bb26]">{{.TemplateCheckValue}}</td>
+                            {{else}}
+                            <td class="px-10 py-2 text-[#fb4934]">{{.TemplateCheckValue}}</td>
+                            {{end -}}
+                        {{end -}}
+                        {{if $.ShowDriftResults}}
+                            {{if .DriftCheckError}}
+                            <td class="px-10 py-2 text-[#928374]">{{.DriftCheckValue}}</td>
+                            {{else if .NoDrift}}
+                            <td class="px-10 py-2 text-[#b8bb26]">{{.DriftCheckValue}}</td>
+                            {{else}}
+                            <td class="px-10 py-2 text-[#fb4934]">{{.DriftCheckValue}}</td>
+                            {{end -}}
+                        {{end -}}
+                    </tr>
+                    {{end -}}
+                </tbody>
+            </table>
+        </div>
+
+        {{if .Diffs }}
+        <div>
+            <h2 class="text-xl text-[#fb4934] font-bold mt-10 flex justify-left items-center">
+                Diffs
+                <button 
+                    class="bg-[#1d2021] text-[#928374] text-xs ml-4 px-4 py-2 hover:bg-[#83a598] hover:text-[#282828] focus:outline-none cursor-pointer" 
+                    onclick="toggleAllDetails()">
+                    Toggle All
+                </button>
+            </h2>
+            {{range .Diffs -}}
+            <div class="my-2 overflow-x-auto">
+                <details>
+                    <summary class="text-[#83a598] cursor-pointer">{{.StackName}}</summary>
+                    <pre class="mt-2 mb-4"><code class="language-diff bg-[#1d2021] text-sm">{{.Diff}}</code></pre>
+                </details>
+            </div>
+            {{end -}}
+        </div>
+        {{end -}}
+
+        {{if .Errors }}
+        <div class="overflow-x-auto">
+        <p class="text-[#fb4934] text-lg font-bold mt-8">Errors</p>
+            {{range $error := .Errors -}}
+            <p class="text-[#bdae93] mt-2 text-sm">{{$error}}</p>
+            {{end -}}
+        </div>
+        {{end -}}
+
+        <p class="text-[#928374] italic my-10 border-[#928374] border-t-2 pt-2 border-opacity-20">Built using <a class="font-bold" href="https://github.com/dhth/outtasync" target="_blank">outtasync</a></p>
+    </div>
+</body>
+    <script>
+        let allDetailsOpen = false;
+
+        function toggleAllDetails() {
+            allDetailsOpen = !allDetailsOpen;
+            document.querySelectorAll('details').forEach(detail => {
+                detail.open = allDetailsOpen;
+            });
+        }
+    </script>
+</html>

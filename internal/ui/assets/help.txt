@@ -1,0 +1,33 @@
+outtasync helps you identify Cloudformation stacks that have drifted or gone out of sync with the state represented by their template files.
+
+outtasync's TUI has 3 views:
+
+- Stacks list
+- Error details
+- Help (this one)
+
+## Keymaps
+
+### General
+
+q                  go back
+esc/ctrl+c         quit immediately
+
+### Stacks List
+
+j/↓                move cursor down
+k/↑                move cursor up
+h                  go to previous page
+l                  go to next page
+g                  go to the top
+G                  go to the end
+tab/<S-tab>        move between filter states
+1                  filter for stacks with code mismatch
+2                  filter for stacks that've drifted
+3                  filter for stacks with errors
+s                  check template sync status for stack under cursor (unwhen unfiltered)
+S                  check template sync status for all stacks (unwhen unfiltered)
+<ctrl+s>           show sync check results (requires git to be available in PATH)
+d                  check drift status for stack under cursor (unwhen unfiltered)
+D                  check drift status for all stacks (unwhen unfiltered)
+e                  show error details (if present)
