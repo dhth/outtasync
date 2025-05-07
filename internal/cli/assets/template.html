@@ -97,8 +97,8 @@
         {{if .Errors }}
         <div class="overflow-x-scroll">
         <p class="text-[#fb4934] text-lg font-bold mt-8">Errors</p>
-            {{range $i, $error := .Errors -}}
-            <p class="text-[#bdae93] mt-2 text-sm">[{{$i}}]: {{$error}}</p>
+            {{range $error := .Errors -}}
+            <p class="text-[#bdae93] mt-2 text-sm">{{$error}}</p>
             {{end -}}
         </div>
         {{end -}}
