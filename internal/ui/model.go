@@ -10,20 +10,10 @@ import (
 	"github.com/dhth/outtasync/internal/types"
 )
 
-type pane uint
-
-const (
-	stacksList pane = iota
-	codeMismatchStacksList
-	driftedStacksList
-	erroredStacksList
-	result
-	errorDetailsPane
-)
-
 type Model struct {
 	cfClients               map[string]aws.CFClient
 	activePane              pane
+	lastPane                pane
 	stacksList              list.Model
 	codeMismatchStacksList  list.Model
 	driftedStacksList       list.Model
@@ -41,6 +31,8 @@ type Model struct {
 	throttledCmds           []tea.Cmd
 	throttledCmdsInProgress int
 	remoteCallHeaders       []types.RemoteCallHeaders
+	helpVP                  viewport.Model
+	helpVPReady             bool
 	terminalWidth           int
 	terminalHeight          int
 }

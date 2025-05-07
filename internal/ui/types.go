@@ -9,6 +9,17 @@ import (
 	"github.com/dhth/outtasync/internal/utils"
 )
 
+type pane uint
+
+const (
+	stacksList pane = iota
+	codeMismatchStacksList
+	driftedStacksList
+	erroredStacksList
+	errorDetailsPane
+	helpPane
+)
+
 type syncCheckStatus uint
 
 const (

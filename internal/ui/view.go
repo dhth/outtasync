@@ -30,11 +30,18 @@ func (m Model) View() string {
 	case erroredStacksList:
 		content = stackListStyle.Render(m.erroredStacksList.View())
 	case errorDetailsPane:
-		errorViewTitle := errorViewStyle.Render("Error(s)")
+		errorViewTitle := errorDetailsTitleStyle.Render("Error(s)")
 		if !m.stackErrorVPReady {
-			content = lipgloss.NewStyle().PaddingLeft(2).Render(lipgloss.JoinVertical(lipgloss.Left, "", errorViewTitle, "", "not ready"))
+			content = vpStyle.Render(lipgloss.JoinVertical(lipgloss.Left, "", errorViewTitle, "", "not ready"))
 		} else {
-			content = lipgloss.NewStyle().PaddingLeft(2).Render(lipgloss.JoinVertical(lipgloss.Left, "", errorViewTitle, "", m.stackErrorVP.View()))
+			content = vpStyle.Render(lipgloss.JoinVertical(lipgloss.Left, "", errorViewTitle, "", m.stackErrorVP.View()))
+		}
+	case helpPane:
+		helpTitle := helpViewTitle.Render("Help")
+		if !m.helpVPReady {
+			content = vpStyle.Render(lipgloss.JoinVertical(lipgloss.Left, "", helpTitle, "", "not ready"))
+		} else {
+			content = vpStyle.Render(lipgloss.JoinVertical(lipgloss.Left, "", helpTitle, "", m.helpVP.View()))
 		}
 	}
 

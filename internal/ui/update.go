@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 
+	_ "embed"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -14,6 +15,9 @@ const (
 	numThrottledCmdsUpperLimit = 3
 	numSyncCallsUpperLimit     = 30
 )
+
+//go:embed assets/help.txt
+var helpStr string
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
@@ -30,18 +34,27 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "q":
 			switch m.activePane {
+			case helpPane:
+				m.activePane = m.lastPane
+				m.lastPane = m.activePane
 			case errorDetailsPane:
-				m.activePane = stacksList
-			case result:
 				m.activePane = stacksList
 			case stacksList:
 				return m, tea.Quit
 			default:
-				m.goBack()
+				m.goBackInTabs()
 			}
-		case "enter", "s":
+		case "esc", "ctrl+c":
+			return m, tea.Quit
+		case "?":
+			if m.activePane == helpPane {
+				break
+			}
+			m.lastPane = m.activePane
+			m.activePane = helpPane
+		case "s":
 			syncCmd, ok := m.getCmdForTemplateCheck()
 			if ok {
 				cmds = append(cmds, syncCmd)
@@ -82,6 +95,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			if si.stack.TemplatePath == nil {
+				m.message = "no template path defined for this stack"
 				break
 			}
 
@@ -95,9 +109,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case "tab":
-			m.goForward()
+			m.goForwardInTabs()
 		case "shift+tab":
-			m.goBack()
+			m.goBackInTabs()
 		case "1":
 			m.activePane = stacksList
 		case "2":
@@ -106,7 +120,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.showDriftedStacks()
 		case "4":
 			m.showStacksWithErrors()
-		case "ctrl+e":
+		case "e":
 			switch m.activePane {
 			case stacksList:
 				var si stackItem
@@ -186,6 +200,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.stackErrorVP.Width = msg.Width - 4
 			m.stackErrorVP.Height = msg.Height - 5
 		}
+		if !m.helpVPReady {
+			m.helpVP = viewport.New(msg.Width-4, m.terminalHeight-5)
+			m.helpVPReady = true
+		} else {
+			m.helpVP.Width = msg.Width - 4
+			m.helpVP.Height = m.terminalHeight - 5
+		}
+		m.helpVP.SetContent(lipgloss.NewStyle().Width(m.terminalWidth - 4).Render(helpStr))
 	case DriftCheckUpdated:
 		si, ok := m.stacksList.Items()[msg.index].(stackItem)
 		if !ok {
@@ -252,6 +274,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	case errorDetailsPane:
 		m.stackErrorVP, cmd = m.stackErrorVP.Update(msg)
+		cmds = append(cmds, cmd)
+	case helpPane:
+		m.helpVP, cmd = m.helpVP.Update(msg)
 		cmds = append(cmds, cmd)
 	}
 
@@ -463,7 +488,7 @@ func (m *Model) recomputeStats() {
 	}
 }
 
-func (m *Model) goForward() {
+func (m *Model) goForwardInTabs() {
 	switch m.activePane {
 	case stacksList:
 		m.showOuttaSyncStacks()
@@ -476,7 +501,7 @@ func (m *Model) goForward() {
 	}
 }
 
-func (m *Model) goBack() {
+func (m *Model) goBackInTabs() {
 	switch m.activePane {
 	case stacksList:
 		m.showStacksWithErrors()

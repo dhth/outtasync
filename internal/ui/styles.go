@@ -17,7 +17,7 @@ const (
 	outtaSyncColor          = "#fb4934"
 	errorColor              = "#928374"
 	errorHeadingColor       = "#fabd2f"
-	helpMsgColor            = "#83a598"
+	helpColor               = "#83a598"
 )
 
 var (
@@ -82,7 +82,9 @@ var (
 	helpMsgStyle = baseStyle.
 			Bold(true).
 			PaddingLeft(2).
-			Foreground(lipgloss.Color(helpMsgColor))
+			Foreground(lipgloss.Color(helpColor))
+
+	vpStyle = lipgloss.NewStyle().PaddingLeft(2)
 
 	tagColors = []string{
 		"#d3869b",
@@ -108,12 +110,17 @@ var (
 		return st
 	}
 
-	errorViewStyle = baseStyle.
+	vpTitleStyle = baseStyle.
 			PaddingLeft(1).
 			PaddingRight(1).
 			Bold(true).
-			Background(lipgloss.Color(errorColor)).
 			Align(lipgloss.Left)
+
+	errorDetailsTitleStyle = vpTitleStyle.
+				Background(lipgloss.Color(errorColor))
+
+	helpViewTitle = vpTitleStyle.
+			Background(lipgloss.Color(helpColor))
 
 	errorDetailsHeadingStyle = baseStyle.
 					Foreground(lipgloss.Color(errorHeadingColor))
