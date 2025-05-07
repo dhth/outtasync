@@ -10,14 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Allow checking for stack drift
-- Add HTML output for results
+- Subcommand for generating config
+- Subcommand for validating config
+- HTML output for results
 
 ### Changed
 
-- Changed outtasync's config file format to allow for optional template paths
+- Changed config file schema to allow for optional template paths
 
 ### Removed
 
 - Ability to refresh AWS credentials directly from the TUI
 
-[unreleased]: https://github.com/dhth/ecscope/compare/v1.2.1...HEAD
+[unreleased]: https://github.com/dhth/outtasync/compare/v1.2.1...HEAD

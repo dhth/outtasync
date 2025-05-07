@@ -71,7 +71,7 @@ with the state represented by their template files.`,
 
 	checkCmd := &cobra.Command{
 		Use:          "check",
-		Short:        "Check sync and drift status for stacks",
+		Short:        "check sync and drift status for stacks",
 		SilenceUsage: true,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			var stackNameRegex *regexp.Regexp
@@ -168,7 +168,7 @@ with the state represented by their template files.`,
 
 	tuiCmd := &cobra.Command{
 		Use:          "tui",
-		Short:        "Open outtasync's tui",
+		Short:        "open outtasync's tui",
 		SilenceUsage: true,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			var stackNameRegex *regexp.Regexp
@@ -227,7 +227,7 @@ with the state represented by their template files.`,
 
 	configCmd := &cobra.Command{
 		Use:          "config",
-		Short:        "Work with outtasync's config",
+		Short:        "work with outtasync's config",
 		SilenceUsage: true,
 	}
 
@@ -281,7 +281,7 @@ with the state represented by their template files.`,
 
 	validateConfigCmd := &cobra.Command{
 		Use:          "validate",
-		Short:        "validate config",
+		Short:        "validate outtasync's config",
 		SilenceUsage: true,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			configPathFull = utils.ExpandTilde(configPath, homeDir)
