@@ -1,6 +1,6 @@
 # outtasync
 
-[![Build Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/outtasync/build.yml?style=flat-square)](https://github.com/dhth/outtasync/actions/workflows/build.yml)
+[![Build Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/outtasync/main.yml?style=flat-square)](https://github.com/dhth/outtasync/actions/workflows/main.yml)
 [![Vulncheck Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/outtasync/vulncheck.yml?style=flat-square&label=vulncheck)](https://github.com/dhth/outtasync/actions/workflows/vulncheck.yml)
 [![Latest Release](https://img.shields.io/github/release/dhth/outtasync.svg?style=flat-square)](https://github.com/dhth/outtasync/releases/latest)
 [![Commits Since Latest Release](https://img.shields.io/github/commits-since/dhth/outtasync/latest?style=flat-square)](https://github.com/dhth/outtasync/releases)
