@@ -7,12 +7,17 @@ linters:
     - nilerr
     - prealloc
     - predeclared
+    - revive
     - rowserrcheck
     - sqlclosecheck
     - unconvert
     - usestdlibvars
     - wastedassign
   exclusions:
+    rules:
+      - linters:
+          - revive
+        text: "var-naming"
     generated: lax
     presets:
       - comments
