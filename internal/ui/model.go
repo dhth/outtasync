@@ -38,9 +38,5 @@ type Model struct {
 }
 
 func (m Model) Init() tea.Cmd {
-	var cmds []tea.Cmd
-
-	cmds = append(cmds, hideHelp(time.Minute*1))
-
-	return tea.Batch(cmds...)
+	return hideHelp(time.Minute * 1)
 }
