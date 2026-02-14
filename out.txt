@@ -1,5 +1,0 @@
-stack                                                       	outtasync   	drifted     
-authentication-service-qa                                   	yes         	yes         
-authentication-service-infrastructure-qa                    	yes         	yes         
-authentication-service-staging                              	yes         	yes         
-authentication-service-infrastructure-staging               	yes         	yes         
