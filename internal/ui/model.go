@@ -38,7 +38,7 @@ type Model struct {
 }
 
 func (m Model) Init() tea.Cmd {
-	var cmds []tea.Cmd
+	cmds := make([]tea.Cmd, 0, 1)
 
 	cmds = append(cmds, hideHelp(time.Minute*1))
 

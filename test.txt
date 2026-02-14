@@ -1,0 +1,6 @@
+[authentication-service-qa Y Y]
+[authentication-service-infrastructure-qa Y Y]
+[authentication-service-staging Y Y]
+[authentication-service-infrastructure-staging Y Y]
+[authentication-service-prod Y Y]
+[authentication-service-infrastructure-prod N U]
