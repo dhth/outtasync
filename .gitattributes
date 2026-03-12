@@ -1,1 +1,2 @@
-*.html linguist-vendored
+* linguist-detectable=false
+*.go linguist-detectable=true
