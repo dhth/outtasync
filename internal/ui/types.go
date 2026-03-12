@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"strings"
 
 	cf "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	cftypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
@@ -135,12 +136,12 @@ func (si stackItem) Description() string {
 		return ""
 	}
 
-	var desc string
+	var desc strings.Builder
 	for _, tag := range si.stack.Tags {
 		nextTag := utils.RightPadTrim(fmt.Sprintf("#%s ", tag), tagWidth)
-		desc += tagStyle(tag).Render(nextTag)
+		desc.WriteString(tagStyle(tag).Render(nextTag))
 	}
-	return desc
+	return desc.String()
 }
 
 func (si stackItem) FilterValue() string { return si.stack.Name }

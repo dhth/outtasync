@@ -179,8 +179,8 @@ func ParseConfigSource(value string) (ConfigSource, error) {
 		return ConfigSource{Env, "env"}, nil
 	}
 
-	if strings.HasPrefix(value, cfgSrcSharedProfilePrefix) {
-		value := strings.TrimPrefix(value, cfgSrcSharedProfilePrefix)
+	if after, ok := strings.CutPrefix(value, cfgSrcSharedProfilePrefix); ok {
+		value := after
 		if strings.TrimSpace(value) == "" {
 			return zero, errConfigSourceEmpty
 		}
@@ -190,8 +190,8 @@ func ParseConfigSource(value string) (ConfigSource, error) {
 		}, nil
 	}
 
-	if strings.HasPrefix(value, cfgSrcAssumeRolePrefix) {
-		value := strings.TrimPrefix(value, cfgSrcAssumeRolePrefix)
+	if after, ok := strings.CutPrefix(value, cfgSrcAssumeRolePrefix); ok {
+		value := after
 		if strings.TrimSpace(value) == "" {
 			return zero, errConfigSourceEmpty
 		}
