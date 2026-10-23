@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	cfgSrcEnv                 = "env"
 	cfgSrcSharedProfilePrefix = "profile:"
 	cfgSrcAssumeRolePrefix    = "assume:"
 )
@@ -51,7 +52,7 @@ func (cs ConfigSource) Display() string {
 	var value string
 	switch cs.Kind {
 	case Env:
-		value = "env"
+		value = cfgSrcEnv
 	case SharedProfile:
 		value = fmt.Sprintf("profile:%s", cs.Value)
 	case AssumeRole:
@@ -175,8 +176,8 @@ func ParseConfigSource(value string) (ConfigSource, error) {
 		return zero, errConfigSourceEmpty
 	}
 
-	if value == "env" {
-		return ConfigSource{Env, "env"}, nil
+	if value == cfgSrcEnv {
+		return ConfigSource{Env, cfgSrcEnv}, nil
 	}
 
 	if after, ok := strings.CutPrefix(value, cfgSrcSharedProfilePrefix); ok {
